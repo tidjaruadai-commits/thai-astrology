@@ -14,10 +14,17 @@
 
   <div class="container">
     <!-- Header -->
-    <header>
-      <div class="thai-border-header">
+    <header style="display: flex; justify-content: space-between; align-items: center; position: relative; padding: 15px 20px;">
+      <div class="thai-border-header" style="flex: 1; text-align: center; margin: 0 auto; max-width: 600px;">
         <h1>สยามพยากรณ์</h1>
         <div class="tagline">Traditional Thai Astrology</div>
+      </div>
+      <div id="auth-header-container" style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); z-index: 10;">
+        <button id="btn-open-login" class="tab-btn" style="background: rgba(212, 175, 55, 0.1); border: 1px solid var(--gold-primary); color: var(--gold-primary); padding: 8px 15px; margin: 0;">เข้าสู่ระบบ</button>
+        <div id="auth-user-info" style="display: none; align-items: center; gap: 10px;">
+          <span id="auth-user-email" style="color: var(--text-secondary); font-size: 0.9rem; max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: none;"></span>
+          <button id="btn-logout" class="tab-btn" style="background: rgba(255, 71, 87, 0.1); border: 1px solid var(--accent-red); color: var(--accent-red); padding: 8px 15px; margin: 0;">ออก</button>
+        </div>
       </div>
     </header>
 
@@ -823,6 +830,33 @@
   </div>
 
   <!-- Audio Element for Shaking effect (using synthesized Web Audio API so it runs without external audio file loading errors!) -->
+
+  <!-- Auth Modal -->
+  <div id="auth-modal" class="modal-overlay" style="display: none; z-index: 2000;">
+    <div class="modal-content" style="max-width: 400px; padding: 30px;">
+      <h2 style="color: var(--gold-primary); text-align: center; margin-bottom: 20px;" id="auth-modal-title">เข้าสู่ระบบ</h2>
+      <form id="auth-form" onsubmit="return false;">
+        <div class="form-group">
+          <label>อีเมล</label>
+          <input type="email" id="auth-email" required placeholder="email@example.com">
+        </div>
+        <div class="form-group">
+          <label>รหัสผ่าน</label>
+          <input type="password" id="auth-password" required minlength="6" placeholder="รหัสผ่านอย่างน้อย 6 ตัวอักษร">
+        </div>
+        <div id="auth-error-msg" style="color: var(--accent-red); margin-bottom: 15px; font-size: 0.9rem; display: none; text-align: center;"></div>
+        
+        <button type="submit" class="btn-submit" id="btn-auth-submit" style="width: 100%;">เข้าสู่ระบบ</button>
+      </form>
+      
+      <div style="text-align: center; margin-top: 20px; font-size: 0.9rem;">
+        <span id="auth-toggle-text" style="color: var(--text-secondary);">ยังไม่มีบัญชีใช่หรือไม่?</span>
+        <a href="#" id="auth-toggle-btn" style="color: var(--gold-primary); text-decoration: underline; margin-left: 5px;">สมัครสมาชิก</a>
+      </div>
+      
+      <button class="btn-close" id="btn-close-auth-modal" style="margin-top: 20px;">ยกเลิก</button>
+    </div>
+  </div>
 
   <!-- Footer -->
   <footer>

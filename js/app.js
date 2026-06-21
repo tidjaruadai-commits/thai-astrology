@@ -1497,4 +1497,140 @@ document.addEventListener('DOMContentLoaded', () => {
   if (refreshBtn) {
     refreshBtn.addEventListener('click', loadHistory);
   }
+  
+  if (typeof initAuth === 'function') {
+    initAuth();
+  }
 });
+
+/**
+ * Authentication UI Logic
+ */
+function initAuth() {
+  const btnOpenLogin = document.getElementById('btn-open-login');
+  const btnLogout = document.getElementById('btn-logout');
+  const authModal = document.getElementById('auth-modal');
+  const btnCloseAuth = document.getElementById('btn-close-auth-modal');
+  const authForm = document.getElementById('auth-form');
+  const authToggleBtn = document.getElementById('auth-toggle-btn');
+  const authModalTitle = document.getElementById('auth-modal-title');
+  const btnAuthSubmit = document.getElementById('btn-auth-submit');
+  const authErrorMsg = document.getElementById('auth-error-msg');
+  const authUserInfo = document.getElementById('auth-user-info');
+  const authUserEmail = document.getElementById('auth-user-email');
+  
+  let isRegisterMode = false;
+
+  if (!DB || !DB.isConfigured()) return; // Don't init auth if DB not ready
+
+  // Listen to Auth State changes
+  DB.onAuthStateChange((event, session) => {
+    if (session && session.user) {
+      btnOpenLogin.style.display = 'none';
+      authUserInfo.style.display = 'flex';
+      authUserEmail.style.display = 'block';
+      authUserEmail.innerText = session.user.email;
+      
+      // Close modal if open
+      authModal.style.display = 'none';
+      
+      // Reload history if currently on history tab
+      const historyTab = document.querySelector('.tab-btn[data-target="history-view"]');
+      if (historyTab && historyTab.classList.contains('active')) {
+        loadHistory();
+      }
+    } else {
+      btnOpenLogin.style.display = 'block';
+      authUserInfo.style.display = 'none';
+      authUserEmail.innerText = '';
+      
+      // Clear history list if logged out
+      const listEl = document.getElementById('history-list');
+      if (listEl) {
+        listEl.innerHTML = '<div style="text-align: center; padding: 30px; color: var(--text-secondary); font-style: italic;">กรุณาเข้าสู่ระบบเพื่อดูประวัติบันทึกดวงชะตา</div>';
+      }
+    }
+  });
+
+  // Check initial session
+  DB.getSession().then(({ data: { session } }) => {
+    if (!session) {
+      const listEl = document.getElementById('history-list');
+      if (listEl) {
+        listEl.innerHTML = '<div style="text-align: center; padding: 30px; color: var(--text-secondary); font-style: italic;">กรุณาเข้าสู่ระบบเพื่อดูประวัติบันทึกดวงชะตา</div>';
+      }
+    }
+  });
+
+  // Open Modal
+  btnOpenLogin.addEventListener('click', () => {
+    authErrorMsg.style.display = 'none';
+    authModal.style.display = 'flex';
+  });
+
+  // Close Modal
+  btnCloseAuth.addEventListener('click', () => {
+    authModal.style.display = 'none';
+  });
+
+  // Toggle Login/Register
+  authToggleBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    isRegisterMode = !isRegisterMode;
+    authErrorMsg.style.display = 'none';
+    
+    if (isRegisterMode) {
+      authModalTitle.innerText = 'สมัครสมาชิก';
+      btnAuthSubmit.innerText = 'สมัครสมาชิก';
+      document.getElementById('auth-toggle-text').innerText = 'มีบัญชีอยู่แล้วใช่หรือไม่?';
+      authToggleBtn.innerText = 'เข้าสู่ระบบ';
+    } else {
+      authModalTitle.innerText = 'เข้าสู่ระบบ';
+      btnAuthSubmit.innerText = 'เข้าสู่ระบบ';
+      document.getElementById('auth-toggle-text').innerText = 'ยังไม่มีบัญชีใช่หรือไม่?';
+      authToggleBtn.innerText = 'สมัครสมาชิก';
+    }
+  });
+
+  // Handle Submit
+  authForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('auth-email').value;
+    const password = document.getElementById('auth-password').value;
+    
+    btnAuthSubmit.disabled = true;
+    btnAuthSubmit.innerText = 'กำลังประมวลผล...';
+    authErrorMsg.style.display = 'none';
+    
+    let result;
+    if (isRegisterMode) {
+      result = await DB.signUp(email, password);
+      if (result.data?.user && result.data?.user?.identities?.length === 0) {
+        // User already exists
+        result.error = { message: 'อีเมลนี้ถูกใช้งานแล้ว' };
+      } else if (!result.error) {
+        alert('สมัครสมาชิกสำเร็จ! กรุณายืนยันอีเมลของคุณ (หากตั้งค่าไว้) หรือเข้าสู่ระบบได้เลย');
+        authToggleBtn.click(); // Switch back to login
+      }
+    } else {
+      result = await DB.signIn(email, password);
+    }
+    
+    if (result.error) {
+      authErrorMsg.innerText = 'เกิดข้อผิดพลาด: ' + (result.error.message === 'Invalid login credentials' ? 'อีเมลหรือรหัสผ่านไม่ถูกต้อง' : result.error.message);
+      authErrorMsg.style.display = 'block';
+    }
+    
+    btnAuthSubmit.disabled = false;
+    btnAuthSubmit.innerText = isRegisterMode ? 'สมัครสมาชิก' : 'เข้าสู่ระบบ';
+  });
+
+  // Handle Logout
+  btnLogout.addEventListener('click', async () => {
+    if (confirm('คุณต้องการออกจากระบบใช่หรือไม่?')) {
+      await DB.signOut();
+      // Reset to destiny view
+      document.querySelector('.tab-btn[data-target="destiny-view"]').click();
+    }
+  });
+}

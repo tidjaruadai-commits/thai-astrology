@@ -20,6 +20,37 @@ const DB = {
     return supabaseClient !== undefined;
   },
 
+  // === AUTHENTICATION ===
+
+  signUp: async function(email, password) {
+    if (!this.isConfigured()) return { error: { message: 'DB Not Configured' } };
+    return await supabaseClient.auth.signUp({ email, password });
+  },
+
+  signIn: async function(email, password) {
+    if (!this.isConfigured()) return { error: { message: 'DB Not Configured' } };
+    return await supabaseClient.auth.signInWithPassword({ email, password });
+  },
+
+  signOut: async function() {
+    if (!this.isConfigured()) return { error: null };
+    return await supabaseClient.auth.signOut();
+  },
+
+  getSession: async function() {
+    if (!this.isConfigured()) return { data: { session: null } };
+    return await supabaseClient.auth.getSession();
+  },
+
+  onAuthStateChange: function(callback) {
+    if (!this.isConfigured()) return;
+    supabaseClient.auth.onAuthStateChange((event, session) => {
+      callback(event, session);
+    });
+  },
+
+  // === DATABASE CRUD ===
+
   /**
    * Save a natal chart to the database
    */
@@ -27,19 +58,31 @@ const DB = {
     if (!this.isConfigured()) return null;
     
     try {
+      const { data: { session } } = await this.getSession();
+      const userId = session?.user?.id;
+      
+      const payload = { 
+        name: name, 
+        birth_date: birthDate, 
+        birth_time: birthTime, 
+        province: province,
+        zodiac_sign: zodiac,
+        ascendant_sign: ascendant,
+        created_at: new Date().toISOString()
+      };
+      
+      // Attach user_id if logged in
+      if (userId) {
+        payload.user_id = userId;
+      } else {
+        // If we strictly require login to save, uncomment the next line:
+        // throw new Error("User must be logged in to save charts.");
+        console.warn("Saving chart anonymously (No user_id).");
+      }
+
       const { data, error } = await supabaseClient
         .from('saved_charts')
-        .insert([
-          { 
-            name: name, 
-            birth_date: birthDate, 
-            birth_time: birthTime, 
-            province: province,
-            zodiac_sign: zodiac,
-            ascendant_sign: ascendant,
-            created_at: new Date().toISOString()
-          }
-        ])
+        .insert([payload])
         .select();
         
       if (error) throw error;
@@ -57,9 +100,15 @@ const DB = {
     if (!this.isConfigured()) return [];
     
     try {
+      const { data: { session } } = await this.getSession();
+      const userId = session?.user?.id;
+      
+      if (!userId) return []; // Cannot fetch history if not logged in
+
       const { data, error } = await supabaseClient
         .from('saved_charts')
         .select('*')
+        .eq('user_id', userId)
         .order('created_at', { ascending: false });
         
       if (error) throw error;

@@ -24,6 +24,7 @@
     <!-- Main Navigation Tabs -->
     <div class="tabs">
       <button class="tab-btn active" data-target="destiny-view">ผูกดวงชะตา</button>
+      <button class="tab-btn" data-target="history-view">ประวัติบันทึก (คลังข้อมูล)</button>
       <button class="tab-btn" data-target="graph-view">กราฟชีวิต</button>
       <button class="tab-btn" data-target="thaksa-view">ทักษาเสวยอายุ</button>
       <button class="tab-btn" data-target="chinese-view">ดวงจีนพยากรณ์</button>
@@ -277,6 +278,37 @@
               <h5>เทวดาผู้รักษาชะตา</h5>
               <p id="guide-deity">-</p>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- History View (Supabase Integration) -->
+    <div id="history-view" class="view-section">
+      <div class="card">
+        <h2 class="card-title">
+          <span>✦</span> คลังข้อมูลดวงชะตา (Supabase)
+        </h2>
+        <p style="color: var(--text-secondary); margin-bottom: 25px;">เรียกดูประวัติดวงชะตาที่เคยบันทึกไว้ในฐานข้อมูลของคุณ</p>
+        
+        <div id="history-config-warning" class="highlight-box" style="display:none; border-left-color: var(--accent-red); background: rgba(255, 71, 87, 0.05); margin-bottom: 20px;">
+          <strong style="color: var(--accent-red);">ยังไม่ได้เชื่อมต่อฐานข้อมูล!</strong>
+          <p style="margin-top: 5px;">กรุณาแก้ไขไฟล์ <code>js/db.js</code> เพื่อระบุ <strong>SUPABASE_URL</strong> และ <strong>SUPABASE_ANON_KEY</strong> ของคุณก่อนใช้งานฟีเจอร์นี้</p>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 15px;">
+          <h3>รายการที่บันทึกไว้</h3>
+          <button id="btn-refresh-history" class="sub-tab-btn" style="background: rgba(255,255,255,0.05); color: #fff;">🔄 รีเฟรชข้อมูล</button>
+        </div>
+
+        <div id="history-loading" style="text-align: center; padding: 20px; color: var(--text-secondary); display: none;">
+          กำลังโหลดข้อมูล...
+        </div>
+
+        <div id="history-list" style="display: grid; gap: 15px;">
+          <!-- Dynamically populated via JS -->
+          <div style="text-align: center; padding: 30px; color: var(--text-secondary); font-style: italic;">
+            ยังไม่มีประวัติการบันทึกดวงชะตา กรุณากด "ผูกดวงชะตาและทำนาย" เพื่อบันทึกข้อมูล
           </div>
         </div>
       </div>
@@ -798,6 +830,8 @@
   </footer>
 
   <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/db.js"></script>
   <script src="js/astrology.js"></script>
   <script src="js/chinese.js"></script>
   <script src="js/app.js"></script>

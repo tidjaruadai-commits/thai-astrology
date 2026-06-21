@@ -109,6 +109,11 @@ function initTabs() {
         const birthDate = document.getElementById('birth-date').value;
         renderLifeGraph(birthDate || new Date().toISOString().split('T')[0]);
       }
+      
+      // If switching to History view, load data from Supabase
+      if (target === 'history-view') {
+        if (typeof loadHistory === 'function') loadHistory();
+      }
     });
   });
 
@@ -173,6 +178,14 @@ function handleDestinySubmit() {
   document.getElementById('badge-ascendant').innerText = `ราศี${ascendantDetails.name}`;
   document.getElementById('badge-zodiac').innerText = `ราศี${zodiacDetails.name}`;
   document.getElementById('badge-day').innerText = dayDetails.name;
+
+  // Save to Supabase DB (if configured)
+  if (typeof DB !== 'undefined' && DB.isConfigured()) {
+    DB.saveChart(name, birthDate, birthTime, province, zodiacDetails.name, ascendantDetails.name)
+      .then(res => {
+        if (res) console.log("Chart saved to Supabase.");
+      });
+  }
 
   // Auspicious Guides
   document.getElementById('guide-lucky-color').innerText = dayDetails.color;
@@ -1416,3 +1429,72 @@ window.setThaiDate = function(id, yyyymmdd) {
     }
   }
 };
+
+/**
+ * History / Supabase Functions
+ */
+async function loadHistory() {
+  const warningEl = document.getElementById('history-config-warning');
+  const loadingEl = document.getElementById('history-loading');
+  const listEl = document.getElementById('history-list');
+  
+  if (!warningEl || !loadingEl || !listEl) return;
+  
+  if (typeof DB === 'undefined' || !DB.isConfigured()) {
+    warningEl.style.display = 'block';
+    return;
+  }
+  
+  warningEl.style.display = 'none';
+  loadingEl.style.display = 'block';
+  listEl.innerHTML = '';
+  
+  const charts = await DB.getSavedCharts();
+  loadingEl.style.display = 'none';
+  
+  if (charts.length === 0) {
+    listEl.innerHTML = '<div style="text-align: center; padding: 30px; color: var(--text-secondary); font-style: italic;">ยังไม่มีประวัติการบันทึกดวงชะตา</div>';
+    return;
+  }
+  
+  charts.forEach(chart => {
+    const d = new Date(chart.birth_date);
+    const dateStr = `${d.getDate()} ${ThaiAstrology.MONTHS[d.getMonth()]} ${d.getFullYear() + 543}`;
+    
+    const div = document.createElement('div');
+    div.className = 'love-partner-card';
+    div.style.position = 'relative';
+    div.innerHTML = `
+      <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+        <div>
+          <h4 style="color: var(--gold-primary); margin-bottom: 5px; font-size: 1.1rem;">👤 ${chart.name}</h4>
+          <p style="font-size: 0.9rem; color: var(--text-secondary);">เกิด: ${dateStr} เวลา ${chart.birth_time} น. จ.${chart.province}</p>
+          <div style="display: flex; gap: 10px; margin-top: 10px;">
+            <span class="result-badge" style="padding: 4px 10px; font-size: 0.85rem; flex: 0 1 auto; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);">ราศี${chart.zodiac_sign}</span>
+            <span class="result-badge" style="padding: 4px 10px; font-size: 0.85rem; flex: 0 1 auto; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);">ลัคนา${chart.ascendant_sign}</span>
+          </div>
+        </div>
+        <button class="delete-btn" data-id="${chart.id}" style="background: transparent; border: none; color: var(--accent-red); cursor: pointer; font-size: 1.2rem;" title="ลบประวัติ">🗑️</button>
+      </div>
+    `;
+    listEl.appendChild(div);
+  });
+  
+  // Attach delete listeners
+  document.querySelectorAll('.delete-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      const id = e.target.closest('.delete-btn').getAttribute('data-id');
+      if (confirm('คุณต้องการลบประวัตินี้ใช่หรือไม่?')) {
+        await DB.deleteChart(id);
+        loadHistory();
+      }
+    });
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const refreshBtn = document.getElementById('btn-refresh-history');
+  if (refreshBtn) {
+    refreshBtn.addEventListener('click', loadHistory);
+  }
+});

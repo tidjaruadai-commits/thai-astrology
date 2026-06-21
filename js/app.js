@@ -26,6 +26,7 @@ let hasCalculatedDestiny = true; // Enabled by default to allow interaction on p
 
 document.addEventListener('DOMContentLoaded', () => {
   initThaiDatePickers();
+  initThaiTimePickers();
   initTabs();
 
   // Destiny Form handler
@@ -1409,6 +1410,71 @@ function initThaiDatePickers() {
   });
 }
 
+function initThaiTimePickers() {
+  document.querySelectorAll('.thai-time-picker').forEach(container => {
+    const targetId = container.getAttribute('data-id');
+    const defaultVal = container.getAttribute('data-default') || '09:00';
+    const isRequired = true; // usually required
+    
+    let html = `<div style="display: flex; gap: 8px; align-items: center;">`;
+    
+    // Hour
+    html += `<select class="tt-hour" ${isRequired?'required':''} style="flex: 1; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.5); color: #fff; font-family: inherit;"><option value="">ชั่วโมง</option>`;
+    for(let h=0; h<24; h++) {
+      html += `<option value="${String(h).padStart(2,'0')}">${String(h).padStart(2,'0')}</option>`;
+    }
+    html += `</select>`;
+    
+    html += `<span style="color: white; font-weight: bold;">:</span>`;
+    
+    // Minute
+    html += `<select class="tt-minute" ${isRequired?'required':''} style="flex: 1; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.5); color: #fff; font-family: inherit;"><option value="">นาที</option>`;
+    for(let m=0; m<60; m++) {
+      html += `<option value="${String(m).padStart(2,'0')}">${String(m).padStart(2,'0')}</option>`;
+    }
+    html += `</select>`;
+    
+    html += `</div>`;
+    html += `<input type="hidden" id="${targetId}" value="${defaultVal}">`;
+    
+    container.innerHTML = html;
+    
+    const hrSel = container.querySelector('.tt-hour');
+    const minSel = container.querySelector('.tt-minute');
+    const hiddenInp = container.querySelector(`#${targetId}`);
+    
+    if (defaultVal) {
+      const [defHr, defMin] = defaultVal.split(':');
+      hrSel.value = defHr;
+      minSel.value = defMin;
+    }
+    
+    const updateHidden = () => {
+      if (hrSel.value && minSel.value) {
+        hiddenInp.value = `${hrSel.value}:${minSel.value}`;
+      } else {
+        hiddenInp.value = '';
+      }
+    };
+    
+    hrSel.addEventListener('change', updateHidden);
+    minSel.addEventListener('change', updateHidden);
+  });
+}
+
+window.setThaiTime = function(id, hhmm) {
+  const hiddenInp = document.getElementById(id);
+  if (!hiddenInp) return;
+  hiddenInp.value = hhmm;
+  const container = hiddenInp.closest('.thai-time-picker');
+  if (container) {
+    const parts = hhmm.split(':');
+    if (parts.length >= 2) {
+      container.querySelector('.tt-hour').value = parts[0];
+      container.querySelector('.tt-minute').value = parts[1];
+    }
+  }
+};
 window.setThaiDate = function(id, yyyymmdd) {
   const hiddenInp = document.getElementById(id);
   if (!hiddenInp) return;

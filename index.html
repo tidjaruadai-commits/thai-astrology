@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>สยามพยากรณ์ - โปรแกรมดูดวงโหราศาสตร์ไทยมงคล</title>
+  <meta name="description" content="ผูกดวงชะตา คำนวณลัคนา วิเคราะห์เรือนชะตาราศี กราฟชีวิตไทยโบราณ ตรวจดวงสมพงษ์คู่ และเซียมซีเสี่ยงทาย ครบครันในแอปเดียว">
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Fixed background stars -->
+  <div class="stars-bg"></div>
+
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="thai-border-header">
+        <h1>สยามพยากรณ์</h1>
+        <div class="tagline">Traditional Thai Astrology</div>
+      </div>
+    </header>
+
+    <!-- Main Navigation Tabs -->
+    <div class="tabs">
+      <button class="tab-btn active" data-target="destiny-view">ผูกดวงชะตา</button>
+      <button class="tab-btn" data-target="graph-view">กราฟชีวิต</button>
+      <button class="tab-btn" data-target="thaksa-view">ทักษาเสวยอายุ</button>
+      <button class="tab-btn" data-target="chinese-view">ดวงจีนพยากรณ์</button>
+      <button class="tab-btn" data-target="number-view">เลขศาสตร์มงคล</button>
+      <button class="tab-btn" data-target="dream-view">ทำนายฝันนำโชค</button>
+      <button class="tab-btn" data-target="colors-view">สีเสื้อมงคล</button>
+      <button class="tab-btn" data-target="love-view">ตรวจดวงสมพงษ์</button>
+      <button class="tab-btn" data-target="siemsee-view">เซียมซีมงคล</button>
+    </div>
+
+    <!-- 1. TAB: Destiny View -->
+    <div id="destiny-view" class="view-section active">
+      <div class="grid-2">
+        <!-- Input Panel -->
+        <div class="card">
+          <h2 class="card-title">
+            <span>✦</span> ป้อนข้อมูลดวงชะตากำเนิด
+          </h2>
+          <form id="destiny-form" onsubmit="return false;">
+            <div class="form-group">
+              <label for="user-name">ชื่อ-นามสกุล (หรือชื่อเล่น)</label>
+              <input type="text" id="user-name" placeholder="ระบุชื่อเพื่อบันทึกดวงชะตา" required>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label>วัน/เดือน/ปี พ.ศ. เกิด</label>
+                <div class="thai-date-picker" data-id="birth-date" data-required="true"></div>
+              </div>
+              <div class="form-group">
+                <label for="birth-time">เวลาเกิด (เวลาตกฟาก)</label>
+                <input type="time" id="birth-time" value="09:00" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="birth-province">จังหวัดที่เกิด</label>
+              <select id="birth-province">
+                <option value="กรุงเทพมหานคร">กรุงเทพมหานคร</option>
+                <option value="กระบี่">กระบี่</option>
+                <option value="กาญจนบุรี">กาญจนบุรี</option>
+                <option value="กาฬสินธุ์">กาฬสินธุ์</option>
+                <option value="กำแพงเพชร">กำแพงเพชร</option>
+                <option value="ขอนแก่น">ขอนแก่น</option>
+                <option value="จันทบุรี">จันทบุรี</option>
+                <option value="ฉะเชิงเทรา">ฉะเชิงเทรา</option>
+                <option value="ชลบุรี">ชลบุรี</option>
+                <option value="ชัยนาท">ชัยนาท</option>
+                <option value="ชัยภูมิ">ชัยภูมิ</option>
+                <option value="ชุมพร">ชุมพร</option>
+                <option value="เชียงราย">เชียงราย</option>
+                <option value="เชียงใหม่">เชียงใหม่</option>
+                <option value="ตรัง">ตรัง</option>
+                <option value="ตราด">ตราด</option>
+                <option value="ตาก">ตาก</option>
+                <option value="นครนายก">นครนายก</option>
+                <option value="นครปฐม">นครปฐม</option>
+                <option value="นครพนม">นครพนม</option>
+                <option value="นครราชสีมา">นครราชสีมา</option>
+                <option value="นครศรีธรรมราช">นครศรีธรรมราช</option>
+                <option value="นครสวรรค์">นครสวรรค์</option>
+                <option value="นนทบุรี">นนทบุรี</option>
+                <option value="นราธิวาส">นราธิวาส</option>
+                <option value="น่าน">น่าน</option>
+                <option value="บึงกาฬ">บึงกาฬ</option>
+                <option value="บุรีรัมย์">บุรีรัมย์</option>
+                <option value="ปทุมธานี">ปทุมธานี</option>
+                <option value="ประจวบคีรีขันธ์">ประจวบคีรีขันธ์</option>
+                <option value="ปราจีนบุรี">ปราจีนบุรี</option>
+                <option value="ปัตตานี">ปัตตานี</option>
+                <option value="พระนครศรีอยุธยา">พระนครศรีอยุธยา</option>
+                <option value="พะเยา">พะเยา</option>
+                <option value="พังงา">พังงา</option>
+                <option value="พัทลุง">พัทลุง</option>
+                <option value="พิจิตร">พิจิตร</option>
+                <option value="พิษณุโลก">พิษณุโลก</option>
+                <option value="เพชรบุรี">เพชรบุรี</option>
+                <option value="เพชรบูรณ์">เพชรบูรณ์</option>
+                <option value="แพร่">แพร่</option>
+                <option value="พะเยา">พะเยา</option>
+                <option value="ภูเก็ต">ภูเก็ต</option>
+                <option value="มหาสารคาม">มหาสารคาม</option>
+                <option value="มุกดาหาร">มุกดาหาร</option>
+                <option value="แม่ฮ่องสอน">แม่ฮ่องสอน</option>
+                <option value="ยโสธร">ยโสธร</option>
+                <option value="ยะลา">ยะลา</option>
+                <option value="ร้อยเอ็ด">ร้อยเอ็ด</option>
+                <option value="ระนอง">ระนอง</option>
+                <option value="ระยอง">ระยอง</option>
+                <option value="ราชบุรี">ราชบุรี</option>
+                <option value="ลพบุรี">ลพบุรี</option>
+                <option value="ลำปาง">ลำปาง</option>
+                <option value="ลำพูน">ลำพูน</option>
+                <option value="เลย">เลย</option>
+                <option value="ศรีสะเกษ">ศรีสะเกษ</option>
+                <option value="สกลนคร">สกลนคร</option>
+                <option value="สงขลา">สงขลา</option>
+                <option value="สตูล">สตูล</option>
+                <option value="สมุทรปราการ">สมุทรปราการ</option>
+                <option value="สมุทรสงคราม">สมุทรสงคราม</option>
+                <option value="สมุทรสาคร">สมุทรสาคร</option>
+                <option value="สระแก้ว">สระแก้ว</option>
+                <option value="สระบุรี">สระบุรี</option>
+                <option value="สิงห์บุรี">สิงห์บุรี</option>
+                <option value="สุโขทัย">สุโขทัย</option>
+                <option value="สุพรรณบุรี">สุพรรณบุรี</option>
+                <option value="สุราษฎร์ธานี">สุราษฎร์ธานี</option>
+                <option value="สุรินทร์">สุรินทร์</option>
+                <option value="หนองคาย">หนองคาย</option>
+                <option value="หนองบัวลำภู">หนองบัวลำภู</option>
+                <option value="อ่างทอง">อ่างทอง</option>
+                <option value="อำนาจเจริญ">อำนาจเจริญ</option>
+                <option value="อุดรธานี">อุดรธานี</option>
+                <option value="อุตรดิตถ์">อุตรดิตถ์</option>
+                <option value="อุทัยธานี">อุทัยธานี</option>
+                <option value="อุบลราชธานี">อุบลราชธานี</option>
+              </select>
+            </div>
+
+            <button type="submit" class="btn-submit" id="btn-calculate-destiny">
+              <span>✦</span> ผูกดวงชะตาและทำนาย
+            </button>
+          </form>
+        </div>
+
+        <!-- Result / Zodiac Display -->
+        <div class="card" style="min-height: 520px;">
+          <h2 class="card-title">
+            <span>✦</span> แผนผังดวงราศีจักรดั้งเดิม
+          </h2>
+          <div class="chart-container">
+            <!-- Custom Astrology Chart (Drawn dynamically via JS inside this SVG structure) -->
+            <svg id="zodiac-svg" viewBox="0 0 400 400" width="100%">
+              <!-- Native Thai Astrology Chart Structure will be rendered here -->
+            </svg>
+          </div>
+          <div class="interact-hint" style="justify-content: center; margin-top: 10px;">
+            <span>ℹ️</span> <em>ตัวเลข ๑-๙, ๐ แทนดวงดาว และ "ล" แทนจุดลัคนาของท่าน</em>
+          </div>
+          <!-- Transit Options -->
+          <div class="form-row" style="margin-top: 15px; border-top: 1px dashed rgba(255,255,255,0.08); padding-top: 15px;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="transit-display">แสดงดาวจรซ้อนภายนอก</label>
+              <select id="transit-display">
+                <option value="none">ดวงกำเนิดอย่างเดียว (วงชั้นเดี่ยว)</option>
+                <option value="show">แสดงดาวจรซ้อนภายนอก (วงสองชั้น)</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label>เลือกวันที่จำลองดาวย้าย (พ.ศ.)</label>
+              <div class="thai-date-picker" data-id="transit-date"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Detail Readings Section (Appears after calculation) -->
+      <div id="destiny-result-details" class="card" style="margin-top: 30px; display: none;">
+        <div class="result-header">
+          <div class="result-badge">
+            <h4>ลัคนาของท่าน</h4>
+            <p id="badge-ascendant">-</p>
+          </div>
+          <div class="result-badge">
+            <h4>ราศีเกิด (สุริยยาตร์)</h4>
+            <p id="badge-zodiac">-</p>
+          </div>
+          <div class="result-badge">
+            <h4>วันเกิด (โหราศาสตร์)</h4>
+            <p id="badge-day">-</p>
+          </div>
+        </div>
+
+        <!-- Subtabs for different predictions -->
+        <div class="sub-tabs">
+          <button class="sub-tab-btn active" data-sub="tab-personality">วาสนา & นิสัย</button>
+          <button class="sub-tab-btn" data-sub="tab-career">การงานความมั่นคง</button>
+          <button class="sub-tab-btn" data-sub="tab-wealth">การเงินรายได้</button>
+          <button class="sub-tab-btn" data-sub="tab-love">ความรักเนื้อคู่</button>
+          <button class="sub-tab-btn" data-sub="tab-transits">อิทธิพลดาวจรปัจจุบัน</button>
+          <button class="sub-tab-btn" data-sub="tab-houses">คำอธิบายเรือนชะตา</button>
+        </div>
+
+        <!-- Reading Content Display Area -->
+        <div class="reading-content">
+          <!-- Personality -->
+          <div id="tab-personality" class="sub-tab-content">
+            <div class="highlight-box" id="personality-summary"></div>
+            <p id="personality-desc"></p>
+          </div>
+          <!-- Career -->
+          <div id="tab-career" class="sub-tab-content" style="display: none;">
+            <div class="highlight-box"><strong>การงานและเกียรติยศ (กัมมะ)</strong></div>
+            <p id="career-desc"></p>
+          </div>
+          <!-- Wealth -->
+          <div id="tab-wealth" class="sub-tab-content" style="display: none;">
+            <div class="highlight-box"><strong>การเงินและทรัพย์สิน (กดุมภะ)</strong></div>
+            <p id="wealth-desc"></p>
+          </div>
+          <!-- Love -->
+          <div id="tab-love" class="sub-tab-content" style="display: none;">
+            <div class="highlight-box"><strong>คนรักคู่ครอง (ปัตนิ)</strong></div>
+            <p id="love-desc"></p>
+          </div>
+          <!-- Houses -->
+          <div id="tab-houses" class="sub-tab-content" style="display: none;">
+            <p>โหราศาสตร์ไทยจะพิจารณาชีวิตออกเป็น 12 ด้าน (เรือนชะตา) เมื่อผูกดวงแล้ว ลัคนาจะตกอยู่เรือนชะตาเริ่มต้น (ตนุ) และเวียนไปตามลำดับราศี:</p>
+            <ul id="houses-list" style="margin-left: 20px; margin-top: 15px; display: grid; gap: 8px;">
+              <!-- Populated via JS -->
+            </ul>
+          </div>
+          <!-- Transits -->
+          <div id="tab-transits" class="sub-tab-content" style="display: none;">
+            <p>ตำแหน่งดาวเคราะห์จรปัจจุบันที่กำลังย้ายตำแหน่งในท้องฟ้า ส่งอิทธิพลกระทบถึงเรือนชะตาส่วนบุคคลของคุณ (พิจารณาอิทธิพลจากดาวดวงใหญ่ย้ายราศีรายปี):</p>
+            <div id="transits-list" style="display: grid; gap: 12px; margin-top: 15px;">
+              <!-- Populated via JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Auspicious Elements -->
+        <h3 style="color: var(--gold-primary); margin-top: 35px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 20px;">
+          ✦ สรุปคู่มือเสริมดวงมงคลเฉพาะบุคคล
+        </h3>
+        <div class="auspicious-grid">
+          <div class="auspicious-item">
+            <div class="auspicious-icon">🎨</div>
+            <div class="auspicious-content">
+              <h5>สีมงคลเสริมดวง</h5>
+              <p id="guide-lucky-color">-</p>
+            </div>
+          </div>
+          <div class="auspicious-item">
+            <div class="auspicious-icon" style="color: var(--accent-red);">❌</div>
+            <div class="auspicious-content">
+              <h5>สีกาลกิณี (ควรเลี่ยง)</h5>
+              <p id="guide-bad-color">-</p>
+            </div>
+          </div>
+          <div class="auspicious-item">
+            <div class="auspicious-icon">🔢</div>
+            <div class="auspicious-content">
+              <h5>เลขนำโชค</h5>
+              <p id="guide-lucky-no">-</p>
+            </div>
+          </div>
+          <div class="auspicious-item">
+            <div class="auspicious-icon">🙏</div>
+            <div class="auspicious-content">
+              <h5>เทวดาผู้รักษาชะตา</h5>
+              <p id="guide-deity">-</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. TAB: Life Graph View -->
+    <div id="graph-view" class="view-section">
+      <div class="card life-graph-card">
+        <h2 class="card-title">
+          <span>✦</span> กราฟชีวิตมหาทักษาตามอายุขัย
+        </h2>
+        <p style="color: var(--text-secondary);">คำนวณจากสูตรมหาทักษาวาสนาชะตากำเนิด แสดงเกณฑ์แนวโน้มคุณภาพชีวิตในด้านต่างๆ (1-7 คะแนน) ตามช่วงวงจรอายุ 12 ปี</p>
+        
+        <div class="canvas-container">
+          <canvas id="life-graph-canvas"></canvas>
+        </div>
+
+        <div class="graph-legend">
+          <div class="legend-item">
+            <div class="legend-color" style="background-color: var(--accent-purple);"></div>
+            <span>การงาน (Career)</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background-color: var(--gold-primary);"></div>
+            <span>การเงิน (Money)</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background-color: var(--accent-red);"></div>
+            <span>ความรัก (Love)</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background-color: var(--accent-green);"></div>
+            <span>สุขภาพ (Health)</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background-color: var(--accent-cyan);"></div>
+            <span>โชคลาภ (Luck)</span>
+          </div>
+        </div>
+
+        <div class="highlight-box">
+          <strong>คำชี้แจงเกณฑ์คะแนนทักษา:</strong>
+          <ul style="margin-left: 20px; margin-top: 10px; display: grid; gap: 5px; font-size: 0.95rem;">
+            <li><strong>6 - 7 คะแนน:</strong> ยอดเยี่ยม มั่นคงสูง ได้รับการอุปถัมภ์สนับสนุน โอกาสสำเร็จง่าย</li>
+            <li><strong>4 - 5 คะแนน:</strong> ปานกลาง ราบเรียบ มีความมั่นคงพึ่งพาได้ตามอัตภาพ</li>
+            <li><strong>1 - 3 คะแนน:</strong> ควรระมัดระวัง มีอุปสรรคขัดขวาง หรือต้องออกแรงเหน็ดเหนื่อยมากกว่าปกติ</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. TAB: Love Compatibility View -->
+    <div id="love-view" class="view-section">
+      <div class="card">
+        <h2 class="card-title">
+          <span>✦</span> ตรวจดวงสมพงษ์คู่ครองวิเศษ
+        </h2>
+        <p style="color: var(--text-secondary); margin-bottom: 25px;">วิเคราะห์ความสอดคล้องตามหลักธาตุราศี วันเกิดทางโหราศาสตร์ เพื่อทำนายเปอร์เซ็นต์ความเหมาะสมในการครองคู่</p>
+
+        <form id="love-form" onsubmit="return false;">
+          <div class="love-inputs">
+            <!-- Person 1 -->
+            <div class="love-partner-card">
+              <h3><span>💙</span> ดวงชะตาฝ่ายแรก</h3>
+              <div class="form-group">
+                <label for="love-p1-name">ชื่อเล่น / ชื่อเรียก</label>
+                <input type="text" id="love-p1-name" value="ดวงของฉัน" required>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>วันเกิด (พ.ศ.)</label>
+                  <div class="thai-date-picker" data-id="love-p1-date" data-required="true"></div>
+                </div>
+                <div class="form-group">
+                  <label for="love-p1-time">เวลาเกิด</label>
+                  <input type="time" id="love-p1-time" value="06:00" required>
+                </div>
+              </div>
+            </div>
+
+            <!-- Person 2 -->
+            <div class="love-partner-card">
+              <h3><span>❤️</span> ดวงชะตาคู่ครอง</h3>
+              <div class="form-group">
+                <label for="love-p2-name">ชื่อคู่รัก / หุ้นส่วน</label>
+                <input type="text" id="love-p2-name" placeholder="ระบุชื่อคนรัก" required>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>วันเกิด (พ.ศ.)</label>
+                  <div class="thai-date-picker" data-id="love-p2-date" data-required="true"></div>
+                </div>
+                <div class="form-group">
+                  <label for="love-p2-time">เวลาเกิด</label>
+                  <input type="time" id="love-p2-time" value="06:00" required>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="love-heart-divider">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="45" height="45"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+          </div>
+
+          <button type="submit" class="btn-submit" id="btn-calculate-love">
+            <span>✦</span> ตรวจดวงสมพงษ์คู่
+          </button>
+        </form>
+
+        <!-- Compatibility Result Output -->
+        <div class="compatibility-result" id="love-result-box">
+          <div class="compatibility-percent" id="love-percent">88%</div>
+          <h3 style="color: var(--gold-primary); margin-bottom: 10px;" id="love-matching-summary">ธาตุดิน กับ ธาตุน้ำ</h3>
+          <p class="compatibility-description" id="love-description">คำทำนายสมพงษ์จะถูกแสดงผลที่นี่หลังจากการคำนวณวิเคราะห์</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. TAB: Siemsee View -->
+    <div id="siemsee-view" class="view-section">
+      <div class="card">
+        <h2 class="card-title">
+          <span>✦</span> เซียมซีมงคลเสี่ยงดวงจิต
+        </h2>
+        <p style="color: var(--text-secondary); text-align: center; margin-bottom: 30px;">
+          ทำสมาธิ ตั้งจิตอธิษฐานถึงเรื่องที่ต้องการเสี่ยงทาย แล้วคลิกที่กระบอกเซียมซีเพื่อเสี่ยงผลใบทำนายชะตา
+        </p>
+
+        <div class="siemsee-stage">
+          <!-- Interactive Siemsee Cup Visual -->
+          <div class="siemsee-container-visual" id="siemsee-cup-container">
+            <!-- Starry Glow -->
+            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, rgba(255,215,0,0.1) 0%, transparent 70%); pointer-events: none; z-index: 0;"></div>
+            
+            <!-- Sticks layer -->
+            <div class="siemsee-sticks-layer" id="siemsee-sticks-container">
+              <!-- Rendered via JS -->
+            </div>
+
+            <!-- Cup Image/Visual -->
+            <svg class="siemsee-cup" viewBox="0 0 100 150" width="100%">
+              <!-- Gold/Red Elegant Cylinder Cup -->
+              <defs>
+                <linearGradient id="cup-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#801010" />
+                  <stop offset="50%" stop-color="#b71c1c" />
+                  <stop offset="70%" stop-color="#ff3333" />
+                  <stop offset="90%" stop-color="#b71c1c" />
+                  <stop offset="100%" stop-color="#600505" />
+                </linearGradient>
+                <linearGradient id="gold-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#b8860b" />
+                  <stop offset="50%" stop-color="#ffd700" />
+                  <stop offset="100%" stop-color="#b8860b" />
+                </linearGradient>
+              </defs>
+              <!-- Cup Body -->
+              <path d="M10,20 L90,20 L80,140 L20,140 Z" fill="url(#cup-grad)" stroke="#ffd700" stroke-width="2" />
+              <!-- Rim -->
+              <ellipse cx="50" cy="20" rx="40" ry="10" fill="#500505" stroke="#ffd700" stroke-width="2" />
+              <!-- Gold Thai Ornament design on Cup -->
+              <path d="M30,50 Q50,70 70,50 Q50,90 30,50" fill="url(#gold-grad)" opacity="0.8" />
+              <path d="M35,80 Q50,95 65,80 Q50,110 35,80" fill="url(#gold-grad)" opacity="0.8" />
+              <text x="50" y="70" fill="url(#gold-grad)" font-family="'Bai Jamjuree', sans-serif" font-size="16" font-weight="bold" text-anchor="middle">เซียมซี</text>
+            </svg>
+          </div>
+
+          <div class="interact-hint" id="siemsee-hint">
+            <span>✨</span> คลิกที่กระบอกเซียมซี หรือคลิกด้านล่างนี้เพื่อเขย่าเสี่ยงทาย
+          </div>
+
+          <button class="btn-submit" id="btn-shake-siemsee" style="max-width: 250px; margin-top: 25px;">
+            🔮 เขย่ากระบอกเซียมซี
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. TAB: Thaksa View -->
+    <div id="thaksa-view" class="view-section">
+      <div class="card">
+        <h2 class="card-title">
+          <span>✦</span> ตารางทักษาจรเสวยอายุประจำปี
+        </h2>
+        <p style="color: var(--text-secondary); margin-bottom: 25px;">คำนวณกำลังดาวคู่ธาตุเสวยอายุในรอบปี ค้นหาจุดเด่นมงคลชูชุบ (ศรี) และเคราะห์จุดอุปสรรคหลีกเลี่ยง (กาลกิณี)</p>
+
+        <form id="thaksa-form" onsubmit="return false;">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="thaksa-birthday">วันเกิด (โหราศาสตร์)</label>
+              <select id="thaksa-birthday">
+                <option value="0">วันอาทิตย์</option>
+                <option value="1">วันจันทร์</option>
+                <option value="2">วันอังคาร</option>
+                <option value="3">วันพุธกลางวัน</option>
+                <option value="7">วันพุธกลางคืน (ราหู)</option>
+                <option value="5">วันพฤหัสบดี</option>
+                <option value="4">วันศุกร์</option>
+                <option value="6">วันเสาร์</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="thaksa-age">อายุปัจจุบัน (ปีเต็ม)</label>
+              <input type="number" id="thaksa-age" value="25" min="1" max="120" required>
+            </div>
+            <div class="form-group">
+              <label for="thaksa-gender">เพศ</label>
+              <select id="thaksa-gender">
+                <option value="male">ชาย (เวียนขวา)</option>
+                <option value="female">หญิง (เวียนซ้าย)</option>
+              </select>
+            </div>
+          </div>
+          <button type="submit" class="btn-submit" id="btn-calculate-thaksa">
+            <span>✦</span> คำนวณตารางทักษา
+          </button>
+        </form>
+
+        <!-- Thaksa 3x3 Grid Display -->
+        <div id="thaksa-result" style="display:none; margin-top: 30px; text-align: center;">
+          <div class="thaksa-grid-container">
+            <div class="thaksa-grid">
+              <!-- Top Row -->
+              <div class="thaksa-cell" id="thaksa-cell-0">
+                <div class="thaksa-planet">๑ อาทิตย์</div>
+                <div class="thaksa-cat" id="thaksa-cat-0">-</div>
+              </div>
+              <div class="thaksa-cell" id="thaksa-cell-1">
+                <div class="thaksa-planet">๒ จันทร์</div>
+                <div class="thaksa-cat" id="thaksa-cat-1">-</div>
+              </div>
+              <div class="thaksa-cell" id="thaksa-cell-2">
+                <div class="thaksa-planet">๓ อังคาร</div>
+                <div class="thaksa-cat" id="thaksa-cat-2">-</div>
+              </div>
+              <!-- Middle Row -->
+              <div class="thaksa-cell" id="thaksa-cell-7">
+                <div class="thaksa-planet">๖ ศุกร์</div>
+                <div class="thaksa-cat" id="thaksa-cat-7">-</div>
+              </div>
+              <div class="thaksa-cell center-cell">
+                <div class="thaksa-planet" style="color: var(--text-secondary); font-weight: bold;">๙ เกตุ</div>
+                <div class="thaksa-cat" style="color: var(--text-secondary);">กลาง</div>
+              </div>
+              <div class="thaksa-cell" id="thaksa-cell-3">
+                <div class="thaksa-planet">๔ พุธ</div>
+                <div class="thaksa-cat" id="thaksa-cat-3">-</div>
+              </div>
+              <!-- Bottom Row -->
+              <div class="thaksa-cell" id="thaksa-cell-6">
+                <div class="thaksa-planet">๘ ราหู</div>
+                <div class="thaksa-cat" id="thaksa-cat-6">-</div>
+              </div>
+              <div class="thaksa-cell" id="thaksa-cell-5">
+                <div class="thaksa-planet">๕ พฤหัสฯ</div>
+                <div class="thaksa-cat" id="thaksa-cat-5">-</div>
+              </div>
+              <div class="thaksa-cell" id="thaksa-cell-4">
+                <div class="thaksa-planet">๗ เสาร์</div>
+                <div class="thaksa-cat" id="thaksa-cat-4">-</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="highlight-box" style="margin-top:25px; text-align: left;" id="thaksa-summary-desc">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. TAB: Number View -->
+    <div id="number-view" class="view-section">
+      <div class="card">
+        <h2 class="card-title">
+          <span>✦</span> วิเคราะห์เลขศาสตร์มงคลป้องชะตา
+        </h2>
+        <p style="color: var(--text-secondary); margin-bottom: 25px;">สแกนตรวจสอบอิทธิพลของพลังตัวเลขเบอร์โทรศัพท์ (10 หลัก) หรือป้ายทะเบียนรถยนต์ เพื่อวิเคราะห์คำพยากรณ์ผลรวมคู่ดาว</p>
+
+        <form id="number-form" onsubmit="return false;">
+          <div class="form-group">
+            <label for="input-number">ระบุหมายเลข (เช่น 0956365415 หรือ ทะเบียนรถ 1234)</label>
+            <input type="text" id="input-number" placeholder="กรอกเฉพาะตัวเลขเพื่อความแม่นยำ" required>
+          </div>
+          <button type="submit" class="btn-submit" id="btn-calculate-number">
+            <span>✦</span> สแกนวิเคราะห์เลขศาสตร์
+          </button>
+        </form>
+
+        <div id="number-result" style="display:none; margin-top: 30px;">
+          <div class="result-header" style="justify-content: center; text-align: center; margin-bottom: 20px;">
+            <div class="result-badge" style="max-width: 150px;">
+              <h4>ผลรวมของตัวเลข</h4>
+              <p id="number-sum-badge" style="font-size: 2.2rem;">-</p>
+            </div>
+          </div>
+
+          <div class="highlight-box">
+            <strong>คำทำนายผลรวมมงคล:</strong>
+            <p id="number-sum-meaning" style="margin-top: 8px; line-height: 1.7; color: #e2e8f0;"></p>
+          </div>
+
+          <h3 style="color: var(--gold-primary); margin-top: 25px; margin-bottom: 15px;">✦ รายละเอียดพลังคู่ดาวที่พบในเบอร์</h3>
+          <div class="pairs-grid" id="number-pairs-container" style="display: grid; gap: 12px;">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. TAB: Dream View -->
+    <div id="dream-view" class="view-section">
+      <div class="card">
+        <h2 class="card-title">
+          <span>✦</span> ทำนายฝันพยากรณ์โชคลาภ
+        </h2>
+        <p style="color: var(--text-secondary); margin-bottom: 20px;">สืบค้นความหมายของความฝัน แก้เคล็ดฝันร้ายกลายเป็นฝันดี และถอดรหัสเลขเด็ดนำโชคเพื่อนำไปซื้อรางวัลมงคล</p>
+
+        <div class="form-group" style="position: relative;">
+          <label for="dream-search">พิมพ์คำค้นหาฝัน (เช่น งู, ทอง, ฟันหัก, พระ)</label>
+          <input type="text" id="dream-search" placeholder="ค้นหาความฝันของคุณ...">
+        </div>
+
+        <div style="margin-bottom: 25px;">
+          <label style="margin-bottom: 10px;">ความฝันยอดนิยม:</label>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;" id="popular-dreams">
+            <!-- Rendered as quick buttons -->
+          </div>
+        </div>
+
+        <div id="dream-result" style="display:none; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 25px;">
+          <h3 style="color: var(--gold-primary); font-size: 1.3rem; margin-bottom: 10px;" id="dream-result-title">ฝันเห็นงู</h3>
+          <p id="dream-result-meaning" style="line-height: 1.8; color: #e2e8f0; margin-bottom: 25px;"></p>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="result-badge" style="background: rgba(0, 242, 254, 0.05); border: 1px solid var(--accent-cyan); border-radius: 12px; padding: 15px;">
+              <h4 style="color: var(--accent-cyan);">เลขท้าย 2 ตัวนำโชค</h4>
+              <p style="font-size: 2.2rem; font-family: var(--font-eng); color: #fff; text-shadow: 0 0 10px var(--accent-cyan);" id="dream-lucky-2">55, 65</p>
+            </div>
+            <div class="result-badge" style="background: rgba(255, 215, 0, 0.05); border: 1px solid var(--gold-primary); border-radius: 12px; padding: 15px;">
+              <h4 style="color: var(--gold-primary);">เลขท้าย 3 ตัวนำโชค</h4>
+              <p style="font-size: 2.2rem; font-family: var(--font-eng); color: #fff; text-shadow: 0 0 10px var(--gold-primary);" id="dream-lucky-3">556, 355</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8. TAB: Colors View -->
+    <div id="colors-view" class="view-section">
+      <div class="card">
+        <h2 class="card-title">
+          <span>✦</span> สีเสื้อผ้าเครื่องประดับมงคลรายวัน
+        </h2>
+        <p style="color: var(--text-secondary); margin-bottom: 25px;">ตารางสีกาลกิณีหลีกเลี่ยง และสีมงคลส่งเสริมดวงชะตา เพื่อช่วยดึงดูดพลังบวกด้านการงาน การเงิน และความรักในแต่ละวัน</p>
+
+        <div style="display: flex; gap: 10px; margin-bottom: 30px; overflow-x: auto; padding-bottom: 8px;" id="colors-day-selectors">
+          <!-- Days selector buttons populated via JS -->
+        </div>
+
+        <div id="colors-result-card" class="love-partner-card" style="border: 2px solid var(--gold-secondary); position: relative; padding: 25px;">
+          <h3 style="font-size: 1.4rem; color: var(--gold-primary); margin-bottom: 20px; text-align: center;" id="colors-result-day-title">วันจันทร์</h3>
+          
+          <div style="display: grid; gap: 18px;">
+            <div class="auspicious-item" style="background: rgba(255,255,255,0.01); border-color: rgba(255,255,255,0.03);">
+              <div class="auspicious-icon" style="color: var(--accent-green);">💼</div>
+              <div class="auspicious-content">
+                <h5 style="color: #fff;">เสริมการงานและอำนาจบารมี</h5>
+                <p id="color-outfit-work" style="color: var(--text-secondary); margin-top: 4px;"></p>
+              </div>
+            </div>
+            <div class="auspicious-item" style="background: rgba(255,255,255,0.01); border-color: rgba(255,255,255,0.03);">
+              <div class="auspicious-icon" style="color: var(--gold-primary);">💰</div>
+              <div class="auspicious-content">
+                <h5 style="color: #fff;">เรียกทรัพย์ โชคลาภและการเงิน</h5>
+                <p id="color-outfit-money" style="color: var(--text-secondary); margin-top: 4px;"></p>
+              </div>
+            </div>
+            <div class="auspicious-item" style="background: rgba(255,255,255,0.01); border-color: rgba(255,255,255,0.03);">
+              <div class="auspicious-icon" style="color: var(--accent-red);">💖</div>
+              <div class="auspicious-content">
+                <h5 style="color: #fff;">เสริมรักเสน่หา ความรักสมบูรณ์</h5>
+                <p id="color-outfit-love" style="color: var(--text-secondary); margin-top: 4px;"></p>
+              </div>
+            </div>
+            <div class="auspicious-item" style="background: rgba(255,71,87,0.04); border-color: rgba(255,71,87,0.15);">
+              <div class="auspicious-icon" style="color: var(--accent-red); background: rgba(255,71,87,0.15);">🚫</div>
+              <div class="auspicious-content">
+                <h5 style="color: var(--accent-red);">สีกาลกิณีต้องห้าม (ควรหลีกเลี่ยงเด็ดขาด)</h5>
+                <p id="color-outfit-bad" style="color: #ff6b81; font-weight: 600; margin-top: 4px;"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9. TAB: Chinese View -->
+    <div id="chinese-view" class="view-section">
+      <div class="card">
+        <h2 class="card-title">
+          <span style="color: var(--accent-red);">☯</span> ดวงจีนพยากรณ์ & ตรวจปีชง 2026
+        </h2>
+        <p style="color: var(--text-secondary); margin-bottom: 25px;">ผูกดวงจีนวิเคราะห์รหัสสถิติ 12 ปีนักษัตรและธาตุกำเนิดกิ่งฟ้า พร้อมตรวจเคราะห์ปีปะทะ (ปีชงร่วม/ปีชง 100%) ประจำปีมะเมีย 2026</p>
+
+        <form id="chinese-form" onsubmit="return false;">
+          <div class="form-row">
+            <div class="form-group">
+              <label>วัน/เดือน/ปี พ.ศ. เกิด</label>
+              <div class="thai-date-picker" data-id="chinese-birth-date" data-required="true"></div>
+            </div>
+            <div class="form-group">
+              <label for="chinese-gender">เพศชะตา</label>
+              <select id="chinese-gender">
+                <option value="male">ชาย (หยาง)</option>
+                <option value="female">หญิง (หยิน)</option>
+              </select>
+            </div>
+          </div>
+          <button type="submit" class="btn-submit" id="btn-calculate-chinese" style="background: linear-gradient(135deg, #c53030, #e53e3e); color: #fff; box-shadow: 0 4px 15px rgba(197, 48, 48, 0.4);">
+            <span>☯</span> ผูกชะตาดวงจีน
+          </button>
+        </form>
+
+        <div id="chinese-result" style="display:none; margin-top: 30px;">
+          
+          <!-- Chinese Zodiac Badges -->
+          <div class="result-header" style="gap: 15px;">
+            <div class="result-badge" style="border-color: #e53e3e; background: rgba(197, 48, 48, 0.08); flex: 1.2;">
+              <h4 style="color: #feb2b2;">ปีนักษัตรจีน (ลี่ชุน)</h4>
+              <p id="chinese-badge-animal" style="font-size: 1.5rem; color: #fff;">-</p>
+            </div>
+            <div class="result-badge" style="border-color: #ffd700; background: rgba(255, 215, 0, 0.08); flex: 1;">
+              <h4 style="color: #ffd700;">ธาตุกำเนิดกิ่งฟ้า</h4>
+              <p id="chinese-badge-element" style="font-size: 1.5rem; color: #fff;">-</p>
+            </div>
+          </div>
+
+          <!-- Zodiac Traits -->
+          <div class="highlight-box" style="border-left-color: #e53e3e; background: rgba(197, 48, 48, 0.04); margin-bottom: 20px;">
+            <strong style="color: #feb2b2;">พื้นดวงชะตาตามปีเกิดนักษัตร:</strong>
+            <p id="chinese-animal-traits" style="margin-top: 6px; line-height: 1.7; color: #f7fafc;"></p>
+          </div>
+
+          <!-- Element Traits -->
+          <div class="highlight-box" style="border-left-color: #ffd700; background: rgba(255, 215, 0, 0.03); margin-bottom: 25px;">
+            <strong style="color: #ffd700;">วิเคราะห์พลังของธาตุกำเนิด:</strong>
+            <p id="chinese-element-traits" style="margin-top: 6px; line-height: 1.7; color: #f7fafc;"></p>
+          </div>
+
+          <!-- Tai Sui Clash Check 2026 -->
+          <h3 style="color: #feb2b2; margin-top: 30px; margin-bottom: 15px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 20px;">
+            ☯ ผลวิเคราะห์ปีชงปะทะ 2026 (ปีมะเมีย ธาตุไฟ)
+          </h3>
+          <div id="chinese-clash-card" class="love-partner-card" style="border-width: 2px; padding: 22px;">
+            <h4 id="chinese-clash-status" style="font-size: 1.3rem; margin-bottom: 10px;">ดวงชะตาราบเรียบปกติ</h4>
+            <p id="chinese-clash-desc" style="line-height: 1.7; color: #e2e8f0; margin-bottom: 15px;"></p>
+            <div class="highlight-box" style="margin-bottom: 0; background: rgba(255,255,255,0.02); border-left-color: var(--gold-secondary);">
+              <strong>💡 แนวทางแก้เคล็ดสะเดาะเคราะห์:</strong>
+              <p id="chinese-clash-remedy" style="margin-top: 5px; font-size: 0.95rem; color: var(--text-secondary);"></p>
+            </div>
+          </div>
+
+          <!-- Chinese Element Compatibility sub-section -->
+          <h3 style="color: #ffd700; margin-top: 35px; margin-bottom: 15px;">☯ ตรวจสอบคู่ธาตุจีนเปรียบเทียบ</h3>
+          <div class="love-partner-card" style="background: rgba(0,0,0,0.2);">
+            <div class="form-group">
+              <label for="chinese-compat-element">ระบุธาตุเกิดคู่รัก/หุ้นส่วน (ไม้, ไฟ, ดิน, ทอง, น้ำ)</label>
+              <select id="chinese-compat-element">
+                <option value="ไม้">ธาตุไม้</option>
+                <option value="ไฟ">ธาตุไฟ</option>
+                <option value="ดิน">ธาตุดิน</option>
+                <option value="ทอง">ธาตุทอง</option>
+                <option value="น้ำ">ธาตุน้ำ</option>
+              </select>
+            </div>
+            <button class="btn-submit" id="btn-check-chinese-compat" style="background: var(--card-bg); border: 1px solid var(--gold-secondary); color: var(--gold-primary); box-shadow: none; padding: 10px;">
+              ตรวจสอบคู่สมพงษ์ธาตุ
+            </button>
+
+            <!-- Compatibility element result -->
+            <div id="chinese-compat-result" style="display:none; margin-top: 20px; text-align: center; border-top: 1px dashed rgba(255,255,255,0.08); padding-top: 15px;">
+              <div style="font-size: 2.2rem; font-weight: bold; color: var(--gold-primary); font-family: var(--font-eng);" id="chinese-compat-score">95%</div>
+              <h4 style="margin-bottom: 8px;" id="chinese-compat-status">คู่ธาตุเกื้อหนุน</h4>
+              <p id="chinese-compat-desc" style="font-size: 0.95rem; color: var(--text-secondary); text-align: left; line-height: 1.6;"></p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Siemsee Result Modal -->
+  <div class="siemsee-modal" id="siemsee-modal">
+    <div class="siemsee-modal-content">
+      <div style="text-align: center;">
+        <div class="siemsee-number-badge" id="modal-stick-number">๑๒</div>
+        <h2 style="color: var(--gold-primary); margin-bottom: 5px;" id="modal-stick-title">ใบที่ ๑๒: ขุมทรัพย์แผ่นดินทอง</h2>
+        <p style="color: var(--text-secondary); font-style: italic; margin-bottom: 25px;" id="modal-stick-verse">"รวยสุขใจรวยทรัพย์นับแสนล้าน..."</p>
+        
+        <div class="reading-content" style="text-align: left; padding: 0 10px;">
+          <div class="highlight-box">
+            <strong>คำทำนายโดยรวม:</strong>
+            <p id="modal-stick-reading" style="margin-top: 8px;"></p>
+          </div>
+        </div>
+
+        <button class="btn-close" id="btn-close-modal">น้อมรับคำทำนาย / ปิด</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Audio Element for Shaking effect (using synthesized Web Audio API so it runs without external audio file loading errors!) -->
+
+  <!-- Footer -->
+  <footer>
+    <p>© 2026 สยามพยากรณ์. พัฒนาขึ้นด้วยใจรักษาหลักโหราศาสตร์ไทยโบราณ</p>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/astrology.js"></script>
+  <script src="js/chinese.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

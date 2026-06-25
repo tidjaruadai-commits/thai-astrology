@@ -46,7 +46,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Initialize new Phase 2 & 3 features
   initThaksa();
-  initNumerology();
+  initWestern();
+  initChinese();
+  initLoveMatch();
   initDream();
   initColors();
   initChinese();
@@ -1305,7 +1307,11 @@ function initChinese() {
 
 function triggerChineseCalculation() {
   const birthDate = document.getElementById('chinese-birth-date').value;
-  if (!birthDate) return;
+  const birthTime = document.getElementById('chinese-birth-time').value;
+  if (!birthDate || !birthTime) {
+    alert("กรุณาระบุวันและเวลาเกิดให้ครบถ้วนสำหรับการผูกดวงปาจื่อ");
+    return;
+  }
 
   const details = ChineseAstrology.getChineseYearDetails(birthDate);
   const clash = ChineseAstrology.checkTaiSuiClash(details.animalIdx);
@@ -1347,8 +1353,186 @@ function triggerChineseCalculation() {
     document.getElementById('chinese-clash-status').style.textShadow = 'none';
   }
 
+  // BaZi Calculation
+  const bazi = ChineseAstrology.calculateBaZi(birthDate, birthTime);
+  if (bazi) {
+    document.getElementById('bazi-year-stem').innerText = bazi.year.stem.name;
+    document.getElementById('bazi-year-stem').style.color = bazi.year.stem.color;
+    document.getElementById('bazi-year-branch').innerText = `${bazi.year.branch.name} (${bazi.year.branch.animal})`;
+
+    document.getElementById('bazi-month-stem').innerText = bazi.month.stem.name;
+    document.getElementById('bazi-month-stem').style.color = bazi.month.stem.color;
+    document.getElementById('bazi-month-branch').innerText = `${bazi.month.branch.name} (${bazi.month.branch.animal})`;
+
+    document.getElementById('bazi-day-stem').innerText = bazi.day.stem.name;
+    document.getElementById('bazi-day-stem').style.color = bazi.day.stem.color;
+    document.getElementById('bazi-day-branch').innerText = `${bazi.day.branch.name} (${bazi.day.branch.animal})`;
+
+    document.getElementById('bazi-hour-stem').innerText = bazi.hour.stem.name;
+    document.getElementById('bazi-hour-stem').style.color = bazi.hour.stem.color;
+    document.getElementById('bazi-hour-branch').innerText = `${bazi.hour.branch.name} (${bazi.hour.branch.animal})`;
+  }
+
   // Show result box
   document.getElementById('chinese-result').style.display = 'block';
+}
+
+/**
+ * Initialize Western Astrology features
+ */
+function initWestern() {
+  const form = document.getElementById('western-form');
+  if (!form) return;
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    triggerWesternCalculation();
+  });
+}
+
+function triggerWesternCalculation() {
+  const dateStr = document.getElementById('western-birth-date').value;
+  const timeStr = document.getElementById('western-birth-time').value;
+  if (!dateStr || !timeStr) return;
+
+  const result = WesternAstrology.calculateChart(dateStr, timeStr);
+  if (!result) return;
+
+  document.getElementById('western-badge-asc').innerText = `${result.zodiac.th} (${result.zodiac.sign})`;
+  
+  const sunP = result.placements.find(p => p.id === 'sun');
+  const moonP = result.placements.find(p => p.id === 'moon');
+  
+  document.getElementById('western-badge-sun').innerText = `${WesternAstrology.ZODIACS[sunP.sign].th} (${WesternAstrology.ZODIACS[sunP.sign].sign})`;
+  document.getElementById('western-badge-moon').innerText = `${WesternAstrology.ZODIACS[moonP.sign].th} (${WesternAstrology.ZODIACS[moonP.sign].sign})`;
+
+  // Render Placements
+  const pList = document.getElementById('western-placements-list');
+  pList.innerHTML = '';
+  result.placements.forEach(p => {
+    const signObj = WesternAstrology.ZODIACS[p.sign];
+    pList.innerHTML += `
+      <div style="background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; border-left: 3px solid var(--gold-primary);">
+        <div>
+          <span style="font-size: 16px; margin-right: 5px;">${p.symbol}</span>
+          <span style="color: #fff;">${p.th} (${p.name})</span>
+        </div>
+        <div style="text-align: right;">
+          <div style="color: var(--gold-primary); font-size: 13px;">สถิตราศี${signObj.th} (${Math.floor(p.degree % 30)}°)</div>
+          <div style="color: var(--text-secondary); font-size: 11px;">เรือนชะตาที่ ${p.house}</div>
+        </div>
+      </div>
+    `;
+  });
+
+  // Render Aspects
+  const aList = document.getElementById('western-aspects-list');
+  aList.innerHTML = '';
+  if (result.aspects.length === 0) {
+    aList.innerHTML = '<p style="color: #aaa;">ไม่มีมุมดาวหลักที่สำคัญ</p>';
+  } else {
+    result.aspects.forEach(asp => {
+      aList.innerHTML += `
+        <div style="background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; display: flex; align-items: center; gap: 10px;">
+          <div style="font-size: 18px; color: #fff;">${asp.p1.symbol}</div>
+          <div style="font-size: 16px; color: var(--gold-primary); font-weight: bold;">${asp.symbol}</div>
+          <div style="font-size: 18px; color: #fff;">${asp.p2.symbol}</div>
+          <div style="margin-left: auto; text-align: right;">
+            <div style="color: #fff; font-size: 13px;">${asp.type}</div>
+            <div style="color: #aaa; font-size: 11px;">Orb: ${asp.orb}°</div>
+          </div>
+        </div>
+      `;
+    });
+  }
+
+  document.getElementById('western-result-details').style.display = 'block';
+  
+  // Render SVG Chart
+  drawWesternZodiacChart(result);
+}
+
+function drawWesternZodiacChart(result) {
+  const svg = document.getElementById('western-svg');
+  if (!svg) return;
+  svg.innerHTML = '';
+  
+  const w = 400, h = 400, cx = w/2, cy = h/2;
+  
+  // Background
+  const bgCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  bgCircle.setAttribute('cx', cx); bgCircle.setAttribute('cy', cy);
+  bgCircle.setAttribute('r', 190); bgCircle.setAttribute('fill', '#090d1a');
+  bgCircle.setAttribute('stroke', '#3498db'); bgCircle.setAttribute('stroke-width', '2');
+  svg.appendChild(bgCircle);
+
+  // Inner rings
+  const r2 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  r2.setAttribute('cx', cx); r2.setAttribute('cy', cy);
+  r2.setAttribute('r', 140); r2.setAttribute('fill', 'none');
+  r2.setAttribute('stroke', '#2c3e50'); r2.setAttribute('stroke-width', '1.5');
+  svg.appendChild(r2);
+  
+  const r3 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  r3.setAttribute('cx', cx); r3.setAttribute('cy', cy);
+  r3.setAttribute('r', 60); r3.setAttribute('fill', '#111');
+  r3.setAttribute('stroke', '#3498db'); r3.setAttribute('stroke-width', '1.5');
+  svg.appendChild(r3);
+
+  // The Ascendant is drawn at 9 o'clock (180 degrees mathematically)
+  // So a planet's degree on the circle = 180 + (AscendantDegree - PlanetDegree)
+  const getAngle = (deg) => 180 + (result.ascendantDegree - deg);
+  
+  // Draw 12 House cusps (Whole Sign: 0, 30, 60 degrees relative to Ascendant sign start)
+  const ascSignStart = result.ascendantSign * 30;
+  for(let i=0; i<12; i++) {
+    const cuspDeg = ascSignStart + i * 30;
+    const a = getAngle(cuspDeg) * Math.PI / 180;
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', cx + 60 * Math.cos(a)); line.setAttribute('y1', cy + 60 * Math.sin(a));
+    line.setAttribute('x2', cx + 190 * Math.cos(a)); line.setAttribute('y2', cy + 190 * Math.sin(a));
+    line.setAttribute('stroke', '#2c3e50');
+    svg.appendChild(line);
+    
+    // House Numbers
+    const midCuspDeg = cuspDeg + 15;
+    const am = getAngle(midCuspDeg) * Math.PI / 180;
+    const tNum = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    tNum.setAttribute('x', cx + 165 * Math.cos(am)); tNum.setAttribute('y', cy + 165 * Math.sin(am));
+    tNum.setAttribute('fill', '#3498db'); tNum.setAttribute('text-anchor', 'middle');
+    tNum.setAttribute('dominant-baseline', 'middle'); tNum.setAttribute('font-size', '12');
+    tNum.textContent = (i + 1).toString();
+    svg.appendChild(tNum);
+  }
+
+  // Draw Planets
+  result.placements.forEach((p, idx) => {
+    // Add small offset to avoid overlap roughly
+    const offset = (idx % 2 === 0) ? 0 : 3;
+    const a = getAngle(p.degree + offset) * Math.PI / 180;
+    const tx = cx + 100 * Math.cos(a);
+    const ty = cy + 100 * Math.sin(a);
+    const tP = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    tP.setAttribute('x', tx); tP.setAttribute('y', ty);
+    tP.setAttribute('fill', '#fff'); tP.setAttribute('text-anchor', 'middle');
+    tP.setAttribute('dominant-baseline', 'middle'); tP.setAttribute('font-size', '16');
+    tP.textContent = p.symbol;
+    svg.appendChild(tP);
+  });
+  
+  // Draw Asc line
+  const ascA = getAngle(result.ascendantDegree) * Math.PI / 180;
+  const ascLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+  ascLine.setAttribute('x1', cx); ascLine.setAttribute('y1', cy);
+  ascLine.setAttribute('x2', cx + 190 * Math.cos(ascA)); ascLine.setAttribute('y2', cy + 190 * Math.sin(ascA));
+  ascLine.setAttribute('stroke', '#ff4757'); ascLine.setAttribute('stroke-width', '2');
+  svg.appendChild(ascLine);
+  
+  const ascT = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  ascT.setAttribute('x', cx + 175 * Math.cos(ascA)); ascT.setAttribute('y', cy - 10 + 175 * Math.sin(ascA));
+  ascT.setAttribute('fill', '#ff4757'); ascT.setAttribute('font-size', '12'); ascT.textContent = "ASC";
+  svg.appendChild(ascT);
+
 }
 
 /**

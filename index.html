@@ -30,16 +30,17 @@
 
     <!-- Main Navigation Tabs -->
     <div class="tabs">
-      <button class="tab-btn active" data-target="destiny-view">ผูกดวงชะตา</button>
-      <button class="tab-btn" data-target="history-view">ประวัติบันทึก (คลังข้อมูล)</button>
+      <button class="tab-btn active" data-target="destiny-view">ผูกดวงชะตา (ไทย)</button>
+      <button class="tab-btn" data-target="western-view">ดวงสากล (Western)</button>
+      <button class="tab-btn" data-target="chinese-view">ดวงจีน (BaZi)</button>
+      <button class="tab-btn" data-target="history-view">ประวัติบันทึก</button>
       <button class="tab-btn" data-target="graph-view">กราฟชีวิต</button>
       <button class="tab-btn" data-target="thaksa-view">ทักษาเสวยอายุ</button>
-      <button class="tab-btn" data-target="chinese-view">ดวงจีนพยากรณ์</button>
-      <button class="tab-btn" data-target="number-view">เลขศาสตร์มงคล</button>
-      <button class="tab-btn" data-target="dream-view">ทำนายฝันนำโชค</button>
+      <button class="tab-btn" data-target="number-view">เลขศาสตร์</button>
+      <button class="tab-btn" data-target="dream-view">ทำนายฝัน</button>
       <button class="tab-btn" data-target="colors-view">สีเสื้อมงคล</button>
-      <button class="tab-btn" data-target="love-view">ตรวจดวงสมพงษ์</button>
-      <button class="tab-btn" data-target="siemsee-view">เซียมซีมงคล</button>
+      <button class="tab-btn" data-target="love-view">สมพงษ์</button>
+      <button class="tab-btn" data-target="siemsee-view">เซียมซี</button>
     </div>
 
     <!-- 1. TAB: Destiny View -->
@@ -211,6 +212,7 @@
           <button class="sub-tab-btn" data-sub="tab-career">การงานความมั่นคง</button>
           <button class="sub-tab-btn" data-sub="tab-wealth">การเงินรายได้</button>
           <button class="sub-tab-btn" data-sub="tab-love">ความรักเนื้อคู่</button>
+          <button class="sub-tab-btn" data-sub="tab-birth-chart" style="color: var(--gold-primary); font-weight: bold;">ทำนายดาวสถิตภพ</button>
           <button class="sub-tab-btn" data-sub="tab-transits">อิทธิพลดาวจรปัจจุบัน</button>
           <button class="sub-tab-btn" data-sub="tab-houses">คำอธิบายเรือนชะตา</button>
         </div>
@@ -236,6 +238,13 @@
           <div id="tab-love" class="sub-tab-content" style="display: none;">
             <div class="highlight-box"><strong>คนรักคู่ครอง (ปัตนิ)</strong></div>
             <p id="love-desc"></p>
+          </div>
+          <!-- Birth Chart (Planets in Houses) -->
+          <div id="tab-birth-chart" class="sub-tab-content" style="display: none;">
+            <p>คำทำนายนี้วิเคราะห์จากดวงดาว ๑๐ ดวง ที่โคจรไปสถิตในเรือนชะตา (ภพ) ทั้ง 12 ของคุณในขณะที่เกิด (แผนผังดวงราศีจักร):</p>
+            <div id="birth-chart-readings" style="display: grid; gap: 15px; margin-top: 15px;">
+              <!-- Populated via JS -->
+            </div>
           </div>
           <!-- Houses -->
           <div id="tab-houses" class="sub-tab-content" style="display: none;">
@@ -286,6 +295,67 @@
               <p id="guide-deity">-</p>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. TAB: Western View -->
+    <div id="western-view" class="view-section" style="display: none;">
+      <div class="grid-2">
+        <div class="card">
+          <h2 class="card-title">
+            <span>✦</span> ผูกดวงสากล (Western Astrology)
+          </h2>
+          <form id="western-form" onsubmit="return false;">
+            <div class="form-row">
+              <div class="form-group">
+                <label>วัน/เดือน/ปี พ.ศ. เกิด</label>
+                <div class="thai-date-picker" data-id="western-birth-date" data-required="true"></div>
+              </div>
+              <div class="form-group">
+                <label for="western-birth-time">เวลาเกิด (เวลาตกฟาก)</label>
+                <div class="thai-time-picker" data-id="western-birth-time" data-default="09:00"></div>
+              </div>
+            </div>
+            <button type="submit" class="btn-submit" id="btn-calculate-western" style="background: linear-gradient(135deg, #2c3e50, #3498db); color: #fff;">
+              <span>✦</span> คำนวณดวงสากล
+            </button>
+          </form>
+        </div>
+
+        <div class="card" style="min-height: 520px;">
+          <h2 class="card-title">
+            <span>✦</span> แผนผังดวงสากล (Tropical Zodiac)
+          </h2>
+          <div class="chart-container" style="background: #111;">
+            <svg id="western-svg" viewBox="0 0 400 400" width="100%"></svg>
+          </div>
+        </div>
+      </div>
+      
+      <div id="western-result-details" class="card" style="margin-top: 30px; display: none;">
+        <h3 style="color: var(--gold-primary); margin-bottom: 20px;">ข้อมูลดวงดาวและเรือนชะตา (Whole Sign Houses)</h3>
+        <div class="result-header">
+          <div class="result-badge">
+            <h4>ลัคนา (Ascendant)</h4>
+            <p id="western-badge-asc">-</p>
+          </div>
+          <div class="result-badge">
+            <h4>ราศีเกิด (Sun Sign)</h4>
+            <p id="western-badge-sun">-</p>
+          </div>
+          <div class="result-badge">
+            <h4>ราศีจันทร์ (Moon Sign)</h4>
+            <p id="western-badge-moon">-</p>
+          </div>
+        </div>
+        <div style="margin-top: 25px;">
+          <h4 style="color: #fff; margin-bottom: 10px;">ดาวสถิตราศีและเรือนชะตา</h4>
+          <div id="western-placements-list" style="display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));"></div>
+        </div>
+        <div style="margin-top: 25px;">
+          <h4 style="color: #fff; margin-bottom: 10px;">มุมดาวสำคัญ (Major Aspects)</h4>
+          <div id="western-aspects-list" style="display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));"></div>
         </div>
       </div>
     </div>
@@ -728,6 +798,10 @@
               <div class="thai-date-picker" data-id="chinese-birth-date" data-required="true"></div>
             </div>
             <div class="form-group">
+              <label for="chinese-birth-time">เวลาเกิด</label>
+              <div class="thai-time-picker" data-id="chinese-birth-time" data-default="09:00"></div>
+            </div>
+            <div class="form-group">
               <label for="chinese-gender">เพศชะตา</label>
               <select id="chinese-gender">
                 <option value="male">ชาย (หยาง)</option>
@@ -736,12 +810,40 @@
             </div>
           </div>
           <button type="submit" class="btn-submit" id="btn-calculate-chinese" style="background: linear-gradient(135deg, #c53030, #e53e3e); color: #fff; box-shadow: 0 4px 15px rgba(197, 48, 48, 0.4);">
-            <span>☯</span> ผูกชะตาดวงจีน
+            <span>☯</span> ผูกชะตาดวงจีน (ปาจื่อ)
           </button>
         </form>
 
-        <div id="chinese-result" style="display:none; margin-top: 30px;">
-          
+        <div id="chinese-result" style="display: none; margin-top: 30px;">
+          <!-- BaZi 4 Pillars Table -->
+          <div class="highlight-box" style="margin-bottom: 25px; border-color: rgba(197, 48, 48, 0.5);">
+            <h3 style="color: #fff; margin-bottom: 15px; text-align: center;">ดวงชะตาสี่เสา (BaZi - ปาจื่อ)</h3>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; text-align: center;">
+              <div style="background: rgba(0,0,0,0.4); padding: 10px; border-radius: 8px;">
+                <div style="color: var(--text-secondary); font-size: 12px; margin-bottom: 5px;">เวลา (Hour)</div>
+                <div id="bazi-hour-stem" style="font-weight: bold; font-size: 18px;">-</div>
+                <div id="bazi-hour-branch" style="color: #aaa; margin-top: 5px;">-</div>
+              </div>
+              <div style="background: rgba(0,0,0,0.4); padding: 10px; border-radius: 8px; border: 1px solid rgba(255, 215, 0, 0.3);">
+                <div style="color: var(--gold-primary); font-size: 12px; margin-bottom: 5px;">วัน (Day Master)</div>
+                <div id="bazi-day-stem" style="font-weight: bold; font-size: 18px;">-</div>
+                <div id="bazi-day-branch" style="color: #aaa; margin-top: 5px;">-</div>
+              </div>
+              <div style="background: rgba(0,0,0,0.4); padding: 10px; border-radius: 8px;">
+                <div style="color: var(--text-secondary); font-size: 12px; margin-bottom: 5px;">เดือน (Month)</div>
+                <div id="bazi-month-stem" style="font-weight: bold; font-size: 18px;">-</div>
+                <div id="bazi-month-branch" style="color: #aaa; margin-top: 5px;">-</div>
+              </div>
+              <div style="background: rgba(0,0,0,0.4); padding: 10px; border-radius: 8px;">
+                <div style="color: var(--text-secondary); font-size: 12px; margin-bottom: 5px;">ปี (Year)</div>
+                <div id="bazi-year-stem" style="font-weight: bold; font-size: 18px;">-</div>
+                <div id="bazi-year-branch" style="color: #aaa; margin-top: 5px;">-</div>
+              </div>
+            </div>
+            <p style="text-align: center; color: var(--text-secondary); font-size: 13px; margin-top: 15px;">* เสาวัน (Day Master) คือธาตุประจำตัวที่แท้จริงของคุณ</p>
+          </div>
+
+
           <!-- Chinese Zodiac Badges -->
           <div class="result-header" style="gap: 15px;">
             <div class="result-badge" style="border-color: #e53e3e; background: rgba(197, 48, 48, 0.08); flex: 1.2;">
@@ -867,6 +969,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/db.js"></script>
   <script src="js/astrology.js"></script>
+  <script src="js/western.js"></script>
   <script src="js/chinese.js"></script>
   <script src="js/app.js"></script>
 </body>

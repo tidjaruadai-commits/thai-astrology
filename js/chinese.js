@@ -213,6 +213,107 @@ const ChineseAstrology = {
       score: 65,
       desc: `ธาตุ <strong>${elem1}</strong> และ <strong>${elem2}</strong> เป็นคู่ธาตุระดับปานกลาง อยู่ร่วมกันได้โดยไม่มีพลังปะทะรุนแรงและไม่ได้หนุนนำเด่นชัด อาศัยความเข้าใจ นิสัยใจคอส่วนบุคคล และการปรับตัวที่ดีจะสามารถสร้างความสุขความมั่นคงร่วมกันได้ดี`
     };
+  // Elements Array for BaZi
+  STEMS: [
+    { name: 'เจี่ย', element: 'ไม้', polarity: 'หยาง', color: '#2ed573', pinyin: 'Jia' },
+    { name: 'อี่', element: 'ไม้', polarity: 'หยิน', color: '#7bed9f', pinyin: 'Yi' },
+    { name: 'ปิ่ง', element: 'ไฟ', polarity: 'หยาง', color: '#ff4757', pinyin: 'Bing' },
+    { name: 'ติง', element: 'ไฟ', polarity: 'หยิน', color: '#ff7f50', pinyin: 'Ding' },
+    { name: 'โบ่ว', element: 'ดิน', polarity: 'หยาง', color: '#ffa502', pinyin: 'Wu' },
+    { name: 'จี่', element: 'ดิน', polarity: 'หยิน', color: '#eccc68', pinyin: 'Ji' },
+    { name: 'เกิง', element: 'ทอง', polarity: 'หยาง', color: '#ffd700', pinyin: 'Geng' },
+    { name: 'ซิน', element: 'ทอง', polarity: 'หยิน', color: '#f1f2f6', pinyin: 'Xin' },
+    { name: 'เหริน', element: 'น้ำ', polarity: 'หยาง', color: '#1e90ff', pinyin: 'Ren' },
+    { name: 'กุ่ย', element: 'น้ำ', polarity: 'หยิน', color: '#70a1ff', pinyin: 'Gui' }
+  ],
+
+  BRANCHES: [
+    { name: 'จื่อ', animal: 'ชวด', pinyin: 'Zi' },
+    { name: 'โฉ่ว', animal: 'ฉลู', pinyin: 'Chou' },
+    { name: 'อิ๋น', animal: 'ขาล', pinyin: 'Yin' },
+    { name: 'เหม่า', animal: 'เถาะ', pinyin: 'Mao' },
+    { name: 'เฉิน', animal: 'มะโรง', pinyin: 'Chen' },
+    { name: 'ซื่อ', animal: 'มะเส็ง', pinyin: 'Si' },
+    { name: 'อู่', animal: 'มะเมีย', pinyin: 'Wu' },
+    { name: 'เว่ย', animal: 'มะแม', pinyin: 'Wei' },
+    { name: 'เซิน', animal: 'วอก', pinyin: 'Shen' },
+    { name: 'โหย่ว', animal: 'ระกา', pinyin: 'You' },
+    { name: 'ซวี', animal: 'จอ', pinyin: 'Xu' },
+    { name: 'ไฮ่', animal: 'กุน', pinyin: 'Hai' }
+  ],
+
+  /**
+   * Calculate BaZi (4 Pillars of Destiny)
+   */
+  calculateBaZi: function(dateStr, timeStr) {
+    if (!window.ThaiAstrology) {
+      console.error("ChineseAstrology requires ThaiAstrology math library for Solar Terms.");
+      return null;
+    }
+
+    const date = new Date(`${dateStr}T${timeStr}:00+07:00`); // Bangkok Time
+    const jd = window.ThaiAstrology.AstroMath.getJulianDay(date);
+
+    // 1. Month Pillar (Depends on Solar Terms)
+    const sunTrop = window.ThaiAstrology.AstroMath.getSunLongitude(jd);
+    // Solar terms start at 315 deg (Li Chun / Tiger Month)
+    let monthIdx = Math.floor((sunTrop + 45) % 360 / 30); 
+    const monthBranchIdx = (monthIdx + 2) % 12;
+
+    // 2. Year Pillar
+    // If we are in solar month index 10, 11 (Capricorn/Aquarius before Li Chun), it belongs to the previous Chinese Solar Year.
+    let astYear = date.getFullYear();
+    // monthIdx 0 is Tiger (Feb). monthIdx 11 is Ox (Jan). monthIdx 10 is Rat (Dec).
+    // Actually, monthIdx calculation: sunTrop=315 -> monthIdx=0 (Tiger).
+    // If sunTrop < 315 and sunTrop >= 255 (Winter solstice to Li Chun), it's the previous year.
+    if (sunTrop < 315 && date.getMonth() < 3) {
+      astYear -= 1;
+    }
+    
+    let yearStemIdx = (astYear - 4) % 10;
+    if (yearStemIdx < 0) yearStemIdx += 10;
+    
+    let yearBranchIdx = (astYear - 4) % 12;
+    if (yearBranchIdx < 0) yearBranchIdx += 12;
+
+    // Month Stem (Rule of 5 Tigers)
+    // Jia/Ji (0, 5) -> Bing (2)
+    // Yi/Geng (1, 6) -> Wu (4)
+    let monthStemStart = ((yearStemIdx % 5) * 2 + 2) % 10;
+    let monthStemIdx = (monthStemStart + monthIdx) % 10;
+
+    // 3. Day Pillar
+    // JD 2451545.0 (Jan 1 2000 12:00 UT) was Wu Wu (Earth Horse).
+    // Calculate local days since then.
+    let hh = date.getHours();
+    let localJD = Math.floor(jd + 0.5 + 7/24);
+    // Chinese day starts at 23:00 (Zi hour)
+    if (hh >= 23) {
+      localJD += 1;
+    }
+
+    let diffDays = (localJD - 2451545) % 60;
+    if (diffDays < 0) diffDays += 60;
+
+    // Jan 1 2000 was Day Stem 4 (Wu), Branch 6 (Wu)
+    let dayStemIdx = (4 + diffDays) % 10;
+    let dayBranchIdx = (6 + diffDays) % 12;
+
+    // 4. Hour Pillar
+    // 23-01 = 0, 01-03 = 1, ...
+    let hourBranchIdx = Math.floor((hh + 1) / 2) % 12;
+    
+    // Hour Stem (Rule of 5 Rats)
+    // Jia/Ji (0, 5) -> Jia (0)
+    let hourStemStart = ((dayStemIdx % 5) * 2) % 10;
+    let hourStemIdx = (hourStemStart + hourBranchIdx) % 10;
+
+    return {
+      year: { stem: this.STEMS[yearStemIdx], branch: this.BRANCHES[yearBranchIdx] },
+      month: { stem: this.STEMS[monthStemIdx], branch: this.BRANCHES[monthBranchIdx] },
+      day: { stem: this.STEMS[dayStemIdx], branch: this.BRANCHES[dayBranchIdx] },
+      hour: { stem: this.STEMS[hourStemIdx], branch: this.BRANCHES[hourBranchIdx] }
+    };
   }
 };
 

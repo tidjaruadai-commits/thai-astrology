@@ -184,33 +184,49 @@ const ThaiAstrology = {
    * Calculate Ascendant (ลัคนา) Sign Index using Local Sidereal Time for Bangkok
    */
   calculateAscendant: function(dateStr, timeStr) {
-    const date = new Date(dateStr + 'T' + timeStr);
-    const jd = this.AstroMath.getJulianDay(date);
-    const t = this.AstroMath.getJulianCenturies(jd);
-    
-    // Greenwich Mean Sidereal Time (GMST) in degrees
-    const gmst = this.AstroMath.normalizeAngle(280.46061837 + 360.98564736629 * (jd - 2451545.0) + 0.000387933 * t * t);
-    
-    // Local Sidereal Time for Bangkok (100.5018 East)
-    const lst = this.AstroMath.normalizeAngle(gmst + 100.5018);
-    
-    // Oblique Ascension for Bangkok Latitude (13.7563 North)
-    const latRad = 13.7563 * Math.PI / 180;
-    const obliqRad = 23.439 * Math.PI / 180;
-    
-    // Correct formula for Ascendant longitude: atan2(cos(LST), -sin(LST)*cos(e) - tan(lat)*sin(e))
-    const y = Math.cos(lst * Math.PI / 180);
-    const x = -Math.sin(lst * Math.PI / 180) * Math.cos(obliqRad) - Math.tan(latRad) * Math.sin(obliqRad);
-    
-    const ascRad = Math.atan2(y, x);
-    let ascDeg = ascRad * 180 / Math.PI;
-    if (ascDeg < 0) ascDeg += 360;
-    
-    // Convert to Sidereal Zodiac using Ayanamsa
+    // Traditional Anto-Natee (อันโตนาทีสามัญ) values for Thailand in minutes
+    // Aries, Taurus, Gemini, Cancer, Leo, Virgo, Libra, Scorpio, Sagittarius, Capricorn, Aquarius, Pisces
+    const antoNatee = [120, 96, 72, 120, 144, 168, 168, 144, 120, 72, 96, 120];
+
+    // Calculate Sun's Sidereal Longitude at 06:00 AM of that day
+    const sunriseDate = new Date(dateStr + 'T06:00:00+07:00'); // Force Bangkok Time
+    const jd = this.AstroMath.getJulianDay(sunriseDate);
     const ayanamsa = this.AstroMath.getAyanamsa(jd);
-    const siderealAsc = this.AstroMath.normalizeAngle(ascDeg - ayanamsa);
+    const sunTrop = this.AstroMath.getSunLongitude(jd);
+    const sunSidereal = this.AstroMath.normalizeAngle(sunTrop - ayanamsa);
     
-    return this.AstroMath.getSignFromLongitude(siderealAsc);
+    const sunSign = Math.floor(sunSidereal / 30);
+    const sunDegree = sunSidereal % 30;
+
+    // Calculate elapsed time since 06:00 AM
+    const [hh, mm] = timeStr.split(':').map(Number);
+    let elapsedMinutes = (hh * 60 + mm) - 360; // 06:00 is 360 minutes
+    if (elapsedMinutes < 0) {
+      elapsedMinutes += 1440; // Before 6 AM belongs to previous sunrise calculation
+    }
+
+    // Time remaining in the first sign (Sun's sign)
+    const remainingFraction = (30 - sunDegree) / 30;
+    const timeInFirstSign = remainingFraction * antoNatee[sunSign];
+
+    if (elapsedMinutes <= timeInFirstSign) {
+      return sunSign;
+    }
+
+    elapsedMinutes -= timeInFirstSign;
+    let currentSign = (sunSign + 1) % 12;
+
+    // Iterate through subsequent signs
+    while (elapsedMinutes > 0) {
+      const timeForSign = antoNatee[currentSign];
+      if (elapsedMinutes <= timeForSign) {
+        return currentSign;
+      }
+      elapsedMinutes -= timeForSign;
+      currentSign = (currentSign + 1) % 12;
+    }
+    
+    return currentSign;
   },
 
   /**

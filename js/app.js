@@ -204,6 +204,26 @@ function handleDestinySubmit() {
   document.getElementById('wealth-desc').innerHTML = `ตามตำแหน่งดาวเกษตรเจ้าเรือนและดาวจรจำลองในระบบดวงชะตา บ่งบอกเกณฑ์ด้านทรัพย์สินไว้ว่า: ${ThaiAstrology.READINGS.houses.กดุมภะ}`;
   document.getElementById('love-desc').innerHTML = `พิจารณาเนื้อคู่คนรักตามหลักคู่ครองสัมพันธ์ (ปัตนิ) บ่งบอกลักษณะคู่ชะตาว่า: ${ThaiAstrology.READINGS.houses.ปัตนิ}`;
 
+  // Birth Chart Readings
+  const birthChartReadingsDiv = document.getElementById('birth-chart-readings');
+  if (birthChartReadingsDiv) {
+    birthChartReadingsDiv.innerHTML = '';
+    const chartReadings = ThaiAstrology.getChartReading(ascendantIdx, planets);
+    if (chartReadings && chartReadings.length > 0) {
+      chartReadings.forEach(reading => {
+        const div = document.createElement('div');
+        div.style.background = 'rgba(255,255,255,0.03)';
+        div.style.padding = '12px';
+        div.style.borderRadius = '8px';
+        div.style.borderLeft = '3px solid var(--gold-primary)';
+        div.innerHTML = reading.html;
+        birthChartReadingsDiv.appendChild(div);
+      });
+    } else {
+      birthChartReadingsDiv.innerHTML = '<p style="color: #aaa;">ไม่มีข้อมูลดาวสถิตภพ</p>';
+    }
+  }
+
   // 12 Houses list generator
   const housesList = document.getElementById('houses-list');
   housesList.innerHTML = '';
@@ -1371,6 +1391,13 @@ function triggerChineseCalculation() {
     document.getElementById('bazi-hour-stem').innerText = bazi.hour.stem.name;
     document.getElementById('bazi-hour-stem').style.color = bazi.hour.stem.color;
     document.getElementById('bazi-hour-branch').innerText = `${bazi.hour.branch.name} (${bazi.hour.branch.animal})`;
+
+    // Reading
+    const dayMasterReading = ChineseAstrology.getDayMasterReading((4 + ((Math.floor(window.ThaiAstrology.AstroMath.getJulianDay(new Date(`${birthDate}T${birthTime}:00+07:00`)) + 0.5 + 7/24) + (parseInt(birthTime.split(':')[0]) >= 23 ? 1 : 0)) - 2451545) % 60 + 60) % 10);
+    // Wait, the bazi object has stem name. We can just use the index by finding it in STEMS, or just pass the bazi.day.stem.name to a lookup.
+    // Actually, I can just use STEMS index by name.
+    const stemIdx = ChineseAstrology.STEMS.findIndex(s => s.name === bazi.day.stem.name);
+    document.getElementById('bazi-reading').innerHTML = ChineseAstrology.getDayMasterReading(stemIdx);
   }
 
   // Show result box
@@ -1398,13 +1425,13 @@ function triggerWesternCalculation() {
   const result = WesternAstrology.calculateChart(dateStr, timeStr);
   if (!result) return;
 
-  document.getElementById('western-badge-asc').innerText = `${result.zodiac.th} (${result.zodiac.sign})`;
+  document.getElementById('western-badge-asc').innerHTML = `<strong style="font-size: 16px;">${result.zodiac.th} (${result.zodiac.sign})</strong><br><br><span style="font-size: 13px; color: var(--text-secondary);">${result.readings.ascendant}</span>`;
   
   const sunP = result.placements.find(p => p.id === 'sun');
   const moonP = result.placements.find(p => p.id === 'moon');
   
-  document.getElementById('western-badge-sun').innerText = `${WesternAstrology.ZODIACS[sunP.sign].th} (${WesternAstrology.ZODIACS[sunP.sign].sign})`;
-  document.getElementById('western-badge-moon').innerText = `${WesternAstrology.ZODIACS[moonP.sign].th} (${WesternAstrology.ZODIACS[moonP.sign].sign})`;
+  document.getElementById('western-badge-sun').innerHTML = `<strong style="font-size: 16px;">${WesternAstrology.ZODIACS[sunP.sign].th} (${WesternAstrology.ZODIACS[sunP.sign].sign})</strong><br><br><span style="font-size: 13px; color: var(--text-secondary);">${result.readings.sun}</span>`;
+  document.getElementById('western-badge-moon').innerHTML = `<strong style="font-size: 16px;">${WesternAstrology.ZODIACS[moonP.sign].th} (${WesternAstrology.ZODIACS[moonP.sign].sign})</strong><br><br><span style="font-size: 13px; color: var(--text-secondary);">${result.readings.moon}</span>`;
 
   // Render Placements
   const pList = document.getElementById('western-placements-list');

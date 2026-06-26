@@ -814,6 +814,29 @@ const ThaiAstrology = {
     });
 
     return interpretations;
+  },
+
+  /**
+   * Calculate Natal Chart (Birth Chart) Interpretations
+   */
+  getChartReading: function(ascendantIdx, natalPlanets) {
+    let readings = [];
+    natalPlanets.forEach(p => {
+      const houseIdx = (p.sign - ascendantIdx + 12) % 12;
+      const house = this.HOUSES[houseIdx];
+      // Generate a generic reading combining planet meaning and house meaning
+      let text = `<strong>ดาว${p.name} (${p.num}) สถิตเรือน${house.name}</strong><br>`;
+      text += `<em>ความหมายดาว:</em> ตัวแทนแห่ง${p.num === '๑' ? 'ยศศักดิ์ อำนาจ และเกียรติยศ' : p.num === '๒' ? 'จริต รูปจริต บริการ และความผูกพัน' : p.num === '๓' ? 'ความกล้าหาญ ขยัน และการต่อสู้' : p.num === '๔' ? 'การเจรจา พาณิชย์ และสติปัญญา' : p.num === '๕' ? 'ปัญญา ธรรมะ ผู้ใหญ่ และโชคลาภ' : p.num === '๖' ? 'ความรัก ศิลปะ และโภคทรัพย์' : p.num === '๗' ? 'ความอดทน โทษทุกข์ และอสังหาริมทรัพย์' : p.num === '๘' ? 'ความลุ่มหลง ไหวพริบ และต่างประเทศ' : p.num === '๙' ? 'สิ่งศักดิ์สิทธิ์ ลางสังหรณ์ และความร่มเย็น' : 'วิถีชีวิตแบบก้าวกระโดด ล้ำสมัย และการปฏิวัติ'}<br>`;
+      text += `<em>สถิตในเรือน${house.name}:</em> ${house.meaning}<br>`;
+      text += `<em>คำทำนาย:</em> วิถีชีวิตของคุณในด้านดาวดวงนี้จะผูกพันและได้รับอิทธิพลจากเรื่อง${house.meaning.split(' ')[0]} เป็นพิเศษ`;
+      
+      readings.push({
+        planet: p.num,
+        houseName: house.name,
+        html: text
+      });
+    });
+    return readings;
   }
 };
 

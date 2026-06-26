@@ -129,7 +129,12 @@ const WesternAstrology = {
       ascendantSign: ascSign,
       zodiac: this.ZODIACS[ascSign],
       placements: placements,
-      aspects: aspects
+      aspects: aspects,
+      readings: {
+        ascendant: `ลัคนา (Ascendant) ของคุณสถิตราศี${this.ZODIACS[ascSign].th} (${this.ZODIACS[ascSign].element} / ${this.ZODIACS[ascSign].quality}) บ่งบอกถึงบุคลิกภาพภายนอกที่คุณแสดงออกให้โลกเห็น และวิธีที่คุณรับมือกับสิ่งใหม่ๆ ลักษณะเด่นคือความเป็น${this.ZODIACS[ascSign].element === 'Fire' ? 'ผู้นำ กระตือรือร้น' : this.ZODIACS[ascSign].element === 'Earth' ? 'คนหนักแน่น จริงจัง' : this.ZODIACS[ascSign].element === 'Air' ? 'คนช่างคิด มีมนุษยสัมพันธ์' : 'คนอ่อนไหว มีความเห็นอกเห็นใจ'}`,
+        sun: `ราศีเกิด (Sun Sign) ของคุณคือราศี${this.ZODIACS[Math.floor(sunDeg / 30)].th} บ่งบอกถึงตัวตนที่แท้จริง พลังงานหลัก และเป้าหมายสูงสุดในชีวิต`,
+        moon: `ราศีจันทร์ (Moon Sign) ของคุณคือราศี${this.ZODIACS[Math.floor(moonDeg / 30)].th} บ่งบอกถึงอารมณ์ความรู้สึกส่วนลึก สัญชาตญาณ และสิ่งที่ทำให้คุณรู้สึกปลอดภัยทางใจ`
+      }
     };
   }
 };

@@ -213,6 +213,7 @@ const ChineseAstrology = {
       score: 65,
       desc: `ธาตุ <strong>${elem1}</strong> และ <strong>${elem2}</strong> เป็นคู่ธาตุระดับปานกลาง อยู่ร่วมกันได้โดยไม่มีพลังปะทะรุนแรงและไม่ได้หนุนนำเด่นชัด อาศัยความเข้าใจ นิสัยใจคอส่วนบุคคล และการปรับตัวที่ดีจะสามารถสร้างความสุขความมั่นคงร่วมกันได้ดี`
     };
+  },
   // Elements Array for BaZi
   STEMS: [
     { name: 'เจี่ย', element: 'ไม้', polarity: 'หยาง', color: '#2ed573', pinyin: 'Jia' },

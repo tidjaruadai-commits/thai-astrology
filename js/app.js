@@ -156,6 +156,12 @@ function handleDestinySubmit() {
 
   if (!birthDate || !birthTime) return;
 
+  // Sync to other tabs for better UX
+  window.setThaiDate('western-birth-date', birthDate);
+  window.setThaiTime('western-birth-time', birthTime);
+  window.setThaiDate('chinese-birth-date', birthDate);
+  window.setThaiTime('chinese-birth-time', birthTime);
+
   // 1. Calculate Astrological features
   const zodiacIdx = ThaiAstrology.getZodiacSign(
     Number(birthDate.split('-')[2]),
@@ -1411,6 +1417,16 @@ function initWestern() {
   const form = document.getElementById('western-form');
   if (!form) return;
 
+  // Pre-fill Western birth date from main form value
+  const mainDate = document.getElementById('birth-date');
+  const mainTime = document.getElementById('birth-time');
+  if (mainDate && mainDate.value) {
+    window.setThaiDate('western-birth-date', mainDate.value);
+  }
+  if (mainTime && mainTime.value) {
+    window.setThaiTime('western-birth-time', mainTime.value);
+  }
+
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     triggerWesternCalculation();
@@ -1420,7 +1436,10 @@ function initWestern() {
 function triggerWesternCalculation() {
   const dateStr = document.getElementById('western-birth-date').value;
   const timeStr = document.getElementById('western-birth-time').value;
-  if (!dateStr || !timeStr) return;
+  if (!dateStr || !timeStr) {
+    alert("กรุณาระบุวันและเวลาเกิดให้ครบถ้วนสำหรับการคำนวณดวงสากล");
+    return;
+  }
 
   const result = WesternAstrology.calculateChart(dateStr, timeStr);
   if (!result) return;
